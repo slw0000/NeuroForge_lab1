@@ -25,8 +25,8 @@ public:
     Matrix operator+(const Matrix& other) const;
     Matrix operator-(const Matrix& other) const;
     Matrix operator*(const Matrix& other) const;
-
     Matrix operator*(double scalar) const;
+    Matrix transpose() const;
 
     friend std::ostream& operator<<(std::ostream& os, const Matrix& m);
 };

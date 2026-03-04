@@ -63,10 +63,20 @@ Matrix Matrix::operator*(const Matrix& other) const {
     return result;
 }
 
-Matrix Matrix::operator*(double scalar) const {  // ← Просто double, без const&
+Matrix Matrix::operator*(double scalar) const {
     Matrix result(rows_, cols_, 0.0);
     for (size_t i = 0; i < data_.size(); ++i) {
         result.data_[i] = data_[i] * scalar;
+    }
+    return result;
+}
+
+Matrix Matrix::transpose() const {
+    Matrix result(cols_, rows_, 0.0);
+    for (size_t i = 0; i < rows_; i++) {
+        for (size_t j = 0; j < cols_; j++) {
+            result(j, i) = (*this)(i, j);
+        }
     }
     return result;
 }
