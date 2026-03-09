@@ -2,13 +2,16 @@
 
 #include <string>
 #include <vector>
+#include "matrix_realization.h"
 
 
-void fileToConsole(std::string const& fileName);
+void fileToConsole(const std::string& fileName);
 
-std::vector<std::vector<float>> fileImport(std::string const& fileName);
+std::vector<std::vector<double>> fileImportRaw(const std::string& fileName);
 
-/* TODO: после реализации класса matrix, сделать возможность открытия файла и записи содержимого (набора координат точек) сразу в нужном для дальнейшей работы формате */
-auto fileImportMatrix();
+std::vector<Matrix> fileImportMatrixRaw(const std::string& fileName);
+
+std::vector<std::pair<Matrix, int>> fileImportMatrixLabel(const std::string& fileName);
+
 
 
