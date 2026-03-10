@@ -133,7 +133,7 @@ std::vector<Matrix> fileImportMatrixRaw(const std::string& fileName) {
 std::pair<std::vector<Matrix>, std::vector<int>> fileImportMatrixLabel(const std::string& fileName) {
     /*
     Записывает данные файла (в формате .csv, т.е. построчно через запятую)
-    в пару <массив Матриц (Matrix), массив меток класса (int)>. Обрабатывает файлы c метками классов.
+    в пару <массив Матриц (Matrix), массив меток классов (int)>. Обрабатывает файлы c метками классов.
     */
 
     std::fstream curFile;
@@ -191,6 +191,7 @@ std::pair<std::vector<Matrix>, std::vector<int>> fileImportMatrixLabel(const std
 }
 
 void fileSaveToCSV(const std::string& fileName, const std::vector<Matrix>& cords, const std::vector<int>& label) {
+    /* Сохраняет координаты (как с метками классов так и без) в текстовый файл в формате csv. */
     if (cords.empty()) {
         throw std::invalid_argument("Массив координат не может быть пустым!");}
     if (!label.empty() && (cords.size() != label.size())) {

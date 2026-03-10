@@ -7,6 +7,11 @@ void runAllMatrixTests();
 void runAllFileImportTests();
 
 int main(int argc, char* argv[]) {
+    /*
+     Для запуска демонстрации работы класса матриц и утилиты работы с файлами, надо просто запустить программу.
+     Для запуска тестирования необходимо запустить программу с конфигурацией "--test".
+     */
+
     bool runTests = false;
     for (int i = 1; i < argc; i++) {
         if (std::string(argv[i]) == "--test") {
