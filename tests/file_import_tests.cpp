@@ -124,10 +124,10 @@ void testFileImportMatrixLabelCorrect() {
 
     auto data = fileImportMatrixLabel("../data/test_labeled.csv");
 
-    assert(data.size() == 3);
-    assert(data[0].first.rows() == 2);
-    assert(data[0].second == 4);
-    assert(data[1].second == 1);
+    assert(data.first.size() == 3);
+    assert(data.first[0].rows() == 2);
+    assert(data.second[0] == 4);
+    assert(data.second[1] == 1);
 
     removeTestFile("../data/test_labeled.csv");
     std::cout << "Test fileImportMatrixLabel correct work - OK" << std::endl;
@@ -136,7 +136,7 @@ void testFileImportMatrixLabelCorrect() {
 void testFileImportMatrixLabelNonIntegerLabel() {
     createTestFile("../data/test_float_label.csv",
         "0.1, 0.2, 0\n"
-        "0.3, 0.4, 0.5");  // Дробная метка
+        "0.3, 0.4, 0.5");
 
     bool caught = false;
     try {
@@ -154,7 +154,7 @@ void testFileImportMatrixLabelNonIntegerLabel() {
 
 void testFileImportMatrixLabelWrongColumnCount() {
     createTestFile("../data/test_wrong_cols2.csv",
-        "0.1, 0.2\n"  // Только 2 колонки
+        "0.1, 0.2\n"
         "0.3, 0.4, 1");
 
     bool caught = false;

@@ -130,15 +130,16 @@ std::vector<Matrix> fileImportMatrixRaw(const std::string& fileName) {
     }
 }
 
-std::vector<std::pair<Matrix, int>> fileImportMatrixLabel(const std::string& fileName) {
+std::pair<std::vector<Matrix>, std::vector<int>> fileImportMatrixLabel(const std::string& fileName) {
     /*
     Записывает данные файла (в формате .csv, т.е. построчно через запятую)
-    в массив пар <Матрица (Matrix), метка класса (int)>. Обрабатывает файлы c метками классов.
+    в пару <массив Матриц (Matrix), массив меток класса (int)>. Обрабатывает файлы c метками классов.
     */
 
     std::fstream curFile;
     std::string line;
-    std::vector<std::pair<Matrix, int>> data;
+    std::vector<Matrix> dataCords;
+    std::vector<int> dataLabels;
     const double eps = 1e-6;
 
     curFile.open(fileName);
@@ -170,8 +171,9 @@ std::vector<std::pair<Matrix, int>> fileImportMatrixLabel(const std::string& fil
             if (row.size() == 3) {
                 cords(0, 0) = row[0];
                 cords(1, 0) = row[1];
+                dataCords.push_back(cords);
                 if (std::abs(std::round(row[2]) - row[2]) < eps) {
-                    data.emplace_back(cords, int(row[2]));
+                    dataLabels.emplace_back(int(row[2]));
                 } else {
                     throw std::invalid_argument("метка класса должна быть целым числом!");
                 }
@@ -180,7 +182,7 @@ std::vector<std::pair<Matrix, int>> fileImportMatrixLabel(const std::string& fil
             }
 
         }
-        return data;
+        return std::make_pair(dataCords, dataLabels);
     } catch (const std::runtime_error& error_message) {
         throw std::runtime_error("Ошибка при открытии файла: " + std::string(error_message.what()));
     } catch (const std::invalid_argument& error_message) {

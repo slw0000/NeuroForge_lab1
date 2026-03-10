@@ -99,10 +99,10 @@ int main(int argc, char* argv[]) {
             std::cout << row << std::endl;
         }
 
-        std::cout << "Считывание в массив <матрица, метка класса>:" << std::endl;
+        std::cout << "Считывание в пару <массив матриц, массив меток класса>:" << std::endl;
         auto data3 = fileImportMatrixLabel("../data/exampleLabel.csv");
-        for (auto& row : data3) {
-            std::cout << row.first << row.second << std::endl;
+        for (int i; i < data3.first.size(); i++) {
+            std::cout << data3.first[i] << data3.second[i] << std::endl;
         }
 
         return 0;
