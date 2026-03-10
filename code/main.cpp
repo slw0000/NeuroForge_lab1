@@ -41,6 +41,10 @@ int main(int argc, char* argv[]) {
     else{
         std::cout << "Начальная точка \n" << std::endl;
 
+        /*
+        ====== Пример использования класса матриц ======
+        */
+
         try {
             Matrix A(2, 3);
             A(0, 0) = 1; A(0, 1) = 2; A(0, 2) = 3;
@@ -77,8 +81,6 @@ int main(int argc, char* argv[]) {
             return 1;
         }
 
-        // =======================================================================================================================================
-
         /*
         ====== Пример использования утилиты открытия файла ======
         */
@@ -104,6 +106,19 @@ int main(int argc, char* argv[]) {
         for (int i; i < data3.first.size(); i++) {
             std::cout << data3.first[i] << data3.second[i] << std::endl;
         }
+
+        std::cout << "Запись координат и меток в файл:\nДанные на входе:" << std::endl;
+        Matrix A(2, 1), B(2, 1), C(2, 1);
+        A(0, 0) = 1; A(1, 0) = 3;
+        B(0, 0) = 2; B(1, 0) = -4;
+        C(0, 0) = 0; C(1, 0) = 9;
+        std::vector<Matrix> data4cords = {A, B, C};
+        std::vector<int> data4label = {1, 2, 3};
+        std::cout << data4cords[0] << " " << data4cords[1] << " " << data4cords[2] << std::endl;
+        std::cout << data4label[0] << " " << data4label[1] << " " << data4label[2] << std::endl;
+
+        fileSaveToCSV("../data/saveExample.csv", data4cords, data4label);
+        std::cout << "Файл успешно создан!" << std::endl;
 
         return 0;
     }

@@ -170,6 +170,95 @@ void testFileImportMatrixLabelWrongColumnCount() {
     std::cout << "Test fileImportMatrixLable w wrong amount of columns - OK" << std::endl;
 }
 
+void testFileSaveToCSVWithoutLabels() {
+    Matrix p1(2, 1); p1(0,0) = 1.3; p1(1,0) = -2.4;
+    Matrix p2(2, 1); p2(0,0) = 3.2; p2(1,0) = 4.0;
+    std::vector<Matrix> cords = {p1, p2};
+
+    fileSaveToCSV("../data/test_save_no_labels.csv", cords);
+
+    std::ifstream file("../data/test_save_no_labels.csv");
+    assert(file.is_open());
+
+    std::string line;
+    std::getline(file, line);
+    assert(line.find("# x, y") != std::string::npos);
+
+    std::getline(file, line);
+    assert(line.find("1.3") != std::string::npos);
+    assert(line.find("-2.4") != std::string::npos);
+
+    file.close();
+    removeTestFile("../data/test_save_no_labels.csv");
+
+    std::cout << "Test fileSaveToCSV no labels - OK" << std::endl;
+}
+
+void testFileSaveToCSVWithLabels() {
+    Matrix p1(2, 1); p1(0,0) = 0.5; p1(1,0) = 0.6;
+    Matrix p2(2, 1); p2(0,0) = 0.7; p2(1,0) = 0.8;
+    std::vector<Matrix> cords = {p1, p2};
+    std::vector<int> labels = {0, 1};
+
+    fileSaveToCSV("../data/test_save_with_labels.csv", cords, labels);
+
+    std::ifstream file("../data/test_save_with_labels.csv");
+    assert(file.is_open());
+
+    std::string line;
+    std::getline(file, line);
+    assert(line.find("# x, y, label") != std::string::npos);
+
+    std::getline(file, line);
+    assert(line.find("0.5") != std::string::npos);
+    assert(line.find("0.6") != std::string::npos);
+    assert(line.find(", 0") != std::string::npos || line.find(",0") != std::string::npos);
+
+    std::getline(file, line);
+    assert(line.find(", 1") != std::string::npos || line.find(",1") != std::string::npos);
+
+    file.close();
+    removeTestFile("../data/test_save_with_labels.csv");
+
+    std::cout << "Test fileSaveToCSV with labels - OK" << std::endl;
+}
+
+void testFileSaveToCSVEmptyCords() {
+    std::vector<Matrix> cords;
+    std::vector<int> labels;
+
+    bool caught = false;
+    try {
+        fileSaveToCSV("../data/test_empty.csv", cords);
+    } catch (const std::invalid_argument&) {
+        caught = true;
+    } catch (...) {
+        caught = true;
+    }
+
+    assert(caught);
+    std::cout << "Test fileSaveToCSV empty cords - OK" << std::endl;
+}
+
+void testFileSaveToCSVWrongSize() {
+    Matrix p1(2, 1); p1(0,0) = 0.5; p1(1,0) = 0.6;
+    Matrix p2(2, 1); p2(0,0) = 0.7; p2(1,0) = 0.8;
+    std::vector<Matrix> cords = {p1, p2};
+    std::vector<int> labels = {0, 1, 2, 3};
+
+    bool caught = false;
+    try {
+        fileSaveToCSV("../data/test_save_with_wrong_size.csv", cords, labels);
+    } catch (const std::invalid_argument&) {
+        caught = true;
+    } catch (...) {
+        caught = true;
+    }
+
+    assert(caught);
+    std::cout << "Test fileSaveToCSV wrong size - OK" << std::endl;
+}
+
 void runAllFileImportTests() {
     testFileImportRawCorrect();
     testFileImportRawComments();
@@ -180,6 +269,11 @@ void runAllFileImportTests() {
     testFileImportMatrixLabelCorrect();
     testFileImportMatrixLabelNonIntegerLabel();
     testFileImportMatrixLabelWrongColumnCount();
+    testFileSaveToCSVWithoutLabels();
+    testFileSaveToCSVWithLabels();
+    testFileSaveToCSVEmptyCords();
+    testFileSaveToCSVWrongSize();
+
 
     std::cout << "All tests passed" << std::endl;
 }

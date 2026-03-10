@@ -189,3 +189,35 @@ std::pair<std::vector<Matrix>, std::vector<int>> fileImportMatrixLabel(const std
         throw std::invalid_argument("Ошибка при открытии файла: " + std::string(error_message.what()));
     }
 }
+
+void fileSaveToCSV(const std::string& fileName, const std::vector<Matrix>& cords, const std::vector<int>& label) {
+    if (cords.empty()) {
+        throw std::invalid_argument("Массив координат не может быть пустым!");}
+    if (!label.empty() && (cords.size() != label.size())) {
+        throw std::invalid_argument("Размеры массива координат и массива меток классов должны совпадать!");}
+
+    std::ofstream curFile(fileName);
+
+    if (!curFile.is_open()) {throw std::runtime_error("Не удаётся открыть файл: " + fileName);}
+
+    if (label.empty()) {
+        curFile << "# x, y" << std::endl;
+    } else {
+        curFile << "# x, y, label" << std::endl;
+    }
+
+    for (size_t i = 0; i < cords.size(); i++) {
+        if (cords[i].rows() != 2 || cords[i].cols() != 1) {
+            throw std::invalid_argument("Матрица должна быть размером 2x1!");
+        }
+
+        curFile << cords[i](0, 0) << ", " << cords[i](1, 0);
+        if (!label.empty()) {
+            curFile << ", " << static_cast<int>(label[i]);
+        }
+
+        curFile << std::endl;
+    }
+};
+
+
