@@ -1,5 +1,6 @@
-#include "fileimport.h"
+#include "file_import.h"
 
+#include <cmath>
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -62,15 +63,17 @@ std::vector<std::vector<double>> fileImportRaw(const std::string& fileName) {
                     row.push_back(std::stod(num));
                 }
             } catch (...) {
-                throw std::runtime_error("неверный формат данных!");
+                throw std::invalid_argument("неверный формат данных!");
             }
 
             data.push_back(row);
 
         }
         return data;
-    } catch (const std::exception& error_message) {
+    } catch (const std::runtime_error& error_message) {
         throw std::runtime_error("Ошибка при открытии файла: " + std::string(error_message.what()));
+    } catch (const std::invalid_argument& error_message) {
+        throw std::invalid_argument("Ошибка при открытии файла: " + std::string(error_message.what()));
     }
 }
 
@@ -107,7 +110,7 @@ std::vector<Matrix> fileImportMatrixRaw(const std::string& fileName) {
                     row.push_back(std::stod(num));
                 }
             } catch (...) {
-                throw std::runtime_error("неверный формат данных!");
+                throw std::invalid_argument("неверный формат данных!");
             }
 
             if (row.size() == 2) {
@@ -115,25 +118,28 @@ std::vector<Matrix> fileImportMatrixRaw(const std::string& fileName) {
                 cords(1, 0) = row[1];
                 data.push_back(cords);
             } else {
-                throw std::runtime_error("количество чисел в строке не равно 2!");
+                throw std::invalid_argument("количество чисел в строке не равно 2!");
             }
 
         }
         return data;
-    } catch (const std::exception& error_message) {
+    } catch (const std::runtime_error& error_message) {
         throw std::runtime_error("Ошибка при открытии файла: " + std::string(error_message.what()));
+    } catch (const std::invalid_argument& error_message) {
+        throw std::invalid_argument("Ошибка при открытии файла: " + std::string(error_message.what()));
     }
 }
 
-std::vector<std::pair<Matrix, int>> fileImportMatrixLabel(const std::string& fileName) {
+std::pair<std::vector<Matrix>, std::vector<int>> fileImportMatrixLabel(const std::string& fileName) {
     /*
     Записывает данные файла (в формате .csv, т.е. построчно через запятую)
-    в массив пар <Матрица (Matrix), метка класса (int)>. Обрабатывает файлы c метками классов.
+    в пару <массив Матриц (Matrix), массив меток классов (int)>. Обрабатывает файлы c метками классов.
     */
 
     std::fstream curFile;
     std::string line;
-    std::vector<std::pair<Matrix, int>> data;
+    std::vector<Matrix> dataCords;
+    std::vector<int> dataLabels;
     const double eps = 1e-6;
 
     curFile.open(fileName);
@@ -159,24 +165,60 @@ std::vector<std::pair<Matrix, int>> fileImportMatrixLabel(const std::string& fil
                     row.push_back(std::stod(num));
                 }
             } catch (...) {
-                throw std::runtime_error("неверный формат данных!");
+                throw std::invalid_argument("неверный формат данных!");
             }
 
             if (row.size() == 3) {
                 cords(0, 0) = row[0];
                 cords(1, 0) = row[1];
+                dataCords.push_back(cords);
                 if (std::abs(std::round(row[2]) - row[2]) < eps) {
-                    data.emplace_back(cords, int(row[2]));
+                    dataLabels.emplace_back(int(row[2]));
                 } else {
-                    throw std::runtime_error("метка класса должна быть целым числом!");
+                    throw std::invalid_argument("метка класса должна быть целым числом!");
                 }
             } else {
-                throw std::runtime_error("количество чисел в строке не равно 3!");
+                throw std::invalid_argument("количество чисел в строке не равно 3!");
             }
 
         }
-        return data;
-    } catch (const std::exception& error_message) {
+        return std::make_pair(dataCords, dataLabels);
+    } catch (const std::runtime_error& error_message) {
         throw std::runtime_error("Ошибка при открытии файла: " + std::string(error_message.what()));
+    } catch (const std::invalid_argument& error_message) {
+        throw std::invalid_argument("Ошибка при открытии файла: " + std::string(error_message.what()));
     }
 }
+
+void fileSaveToCSV(const std::string& fileName, const std::vector<Matrix>& cords, const std::vector<int>& label) {
+    /* Сохраняет координаты (как с метками классов так и без) в текстовый файл в формате csv. */
+    if (cords.empty()) {
+        throw std::invalid_argument("Массив координат не может быть пустым!");}
+    if (!label.empty() && (cords.size() != label.size())) {
+        throw std::invalid_argument("Размеры массива координат и массива меток классов должны совпадать!");}
+
+    std::ofstream curFile(fileName);
+
+    if (!curFile.is_open()) {throw std::runtime_error("Не удаётся открыть файл: " + fileName);}
+
+    if (label.empty()) {
+        curFile << "# x, y" << std::endl;
+    } else {
+        curFile << "# x, y, label" << std::endl;
+    }
+
+    for (size_t i = 0; i < cords.size(); i++) {
+        if (cords[i].rows() != 2 || cords[i].cols() != 1) {
+            throw std::invalid_argument("Матрица должна быть размером 2x1!");
+        }
+
+        curFile << cords[i](0, 0) << ", " << cords[i](1, 0);
+        if (!label.empty()) {
+            curFile << ", " << static_cast<int>(label[i]);
+        }
+
+        curFile << std::endl;
+    }
+};
+
+
