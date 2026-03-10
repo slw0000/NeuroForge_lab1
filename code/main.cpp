@@ -1,9 +1,10 @@
 #include <iostream>
 
 #include "matrix_realization.h"
-#include "fileimport.h"
+#include "file_import.h"
 
 void runAllMatrixTests();
+void runAllFileImportTests();
 
 int main(int argc, char* argv[]) {
     bool runTests = false;
@@ -18,6 +19,17 @@ int main(int argc, char* argv[]) {
         std::cout << "Matrix tests: \n" << std::endl;
         try {
             runAllMatrixTests();
+        } catch (const std::exception& e) {
+            std::cerr << "Error: " << e.what() << std::endl;
+            return 1;
+        } catch (...) {
+            std::cerr << "Unknown error" << std::endl;
+            return 1;
+        }
+
+        std::cout << "\nFile import tests: \n" << std::endl;
+        try {
+            runAllFileImportTests();
         } catch (const std::exception& e) {
             std::cerr << "Error: " << e.what() << std::endl;
             return 1;
@@ -92,31 +104,6 @@ int main(int argc, char* argv[]) {
         for (auto& row : data3) {
             std::cout << row.first << row.second << std::endl;
         }
-
-        try {
-            auto dataError = fileImportMatrixRaw("../data/WrongName.csv");
-        } catch (const std::exception& error_message) {
-            std::cerr << "Пойманная ошибка: " << error_message.what() << std::endl;
-        }
-
-        try {
-            auto dataError = fileImportMatrixRaw("../data/fileErrorExample.csv");
-        } catch (const std::exception& error_message) {
-            std::cerr << "Пойманная ошибка: " << error_message.what() << std::endl;
-        }
-
-        try {
-            auto dataError = fileImportRaw("../data/fileErrorExample.csv");
-        } catch (const std::exception& error_message) {
-            std::cerr << "Пойманная ошибка: " << error_message.what() << std::endl;
-        }
-
-        try {
-            auto dataError = fileImportMatrixLabel("../data/fileErrorExample.csv");
-        } catch (const std::exception& error_message) {
-            std::cerr << "Пойманная ошибка: " << error_message.what() << std::endl;
-        }
-
 
         return 0;
     }

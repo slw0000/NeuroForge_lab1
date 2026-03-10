@@ -1,7 +1,6 @@
 #include <cassert>
 #include <iostream>
-#include <cmath>
-#include "matrix_realization.h"
+#include "../code/matrix_realization.h"
 
 void assertDoubleEquals(double actual, double expected, double tolerance= 0.000) {
     if (std::abs(actual - expected) > tolerance) {

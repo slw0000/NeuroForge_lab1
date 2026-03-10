@@ -1,4 +1,4 @@
-#include "fileimport.h"
+#include "file_import.h"
 
 #include <cmath>
 #include <iostream>
@@ -63,15 +63,17 @@ std::vector<std::vector<double>> fileImportRaw(const std::string& fileName) {
                     row.push_back(std::stod(num));
                 }
             } catch (...) {
-                throw std::runtime_error("неверный формат данных!");
+                throw std::invalid_argument("неверный формат данных!");
             }
 
             data.push_back(row);
 
         }
         return data;
-    } catch (const std::exception& error_message) {
+    } catch (const std::runtime_error& error_message) {
         throw std::runtime_error("Ошибка при открытии файла: " + std::string(error_message.what()));
+    } catch (const std::invalid_argument& error_message) {
+        throw std::invalid_argument("Ошибка при открытии файла: " + std::string(error_message.what()));
     }
 }
 
@@ -108,7 +110,7 @@ std::vector<Matrix> fileImportMatrixRaw(const std::string& fileName) {
                     row.push_back(std::stod(num));
                 }
             } catch (...) {
-                throw std::runtime_error("неверный формат данных!");
+                throw std::invalid_argument("неверный формат данных!");
             }
 
             if (row.size() == 2) {
@@ -116,13 +118,15 @@ std::vector<Matrix> fileImportMatrixRaw(const std::string& fileName) {
                 cords(1, 0) = row[1];
                 data.push_back(cords);
             } else {
-                throw std::runtime_error("количество чисел в строке не равно 2!");
+                throw std::invalid_argument("количество чисел в строке не равно 2!");
             }
 
         }
         return data;
-    } catch (const std::exception& error_message) {
+    } catch (const std::runtime_error& error_message) {
         throw std::runtime_error("Ошибка при открытии файла: " + std::string(error_message.what()));
+    } catch (const std::invalid_argument& error_message) {
+        throw std::invalid_argument("Ошибка при открытии файла: " + std::string(error_message.what()));
     }
 }
 
@@ -160,7 +164,7 @@ std::vector<std::pair<Matrix, int>> fileImportMatrixLabel(const std::string& fil
                     row.push_back(std::stod(num));
                 }
             } catch (...) {
-                throw std::runtime_error("неверный формат данных!");
+                throw std::invalid_argument("неверный формат данных!");
             }
 
             if (row.size() == 3) {
@@ -169,15 +173,17 @@ std::vector<std::pair<Matrix, int>> fileImportMatrixLabel(const std::string& fil
                 if (std::abs(std::round(row[2]) - row[2]) < eps) {
                     data.emplace_back(cords, int(row[2]));
                 } else {
-                    throw std::runtime_error("метка класса должна быть целым числом!");
+                    throw std::invalid_argument("метка класса должна быть целым числом!");
                 }
             } else {
-                throw std::runtime_error("количество чисел в строке не равно 3!");
+                throw std::invalid_argument("количество чисел в строке не равно 3!");
             }
 
         }
         return data;
-    } catch (const std::exception& error_message) {
+    } catch (const std::runtime_error& error_message) {
         throw std::runtime_error("Ошибка при открытии файла: " + std::string(error_message.what()));
+    } catch (const std::invalid_argument& error_message) {
+        throw std::invalid_argument("Ошибка при открытии файла: " + std::string(error_message.what()));
     }
 }
