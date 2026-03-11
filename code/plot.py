@@ -1,39 +1,33 @@
+import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-import pandas as pd
-import os
-
+import sys
 
 def plot_answer(path):
-    """
-    path - ссылка на .csv
-
-    формат .csv :
-
-    x,y,c\n
-    0,0,0\n
-    ...
-    """
+    """Визуализация данных из CSV"""
     colors = cm.tab10.colors
-
     df = pd.read_csv(path)
     print(f"Работаем с {path}")
-    print(df['c'].unique())
-
-    for i in range(max(df['c'])):
+    
+    # Исправил цикл, чтобы он надежно перебирал все уникальные классы
+    for i in df['c'].unique():
         df0 = df[df["c"] == i]
-        plt.scatter(df0["x"], df0["y"], c=colors[i % len(colors)])
+        # Берем цвет из палитры (i % len(colors) не даст выйти за пределы списка цветов)
+        color_index = int(i) % len(colors)
+        plt.scatter(df0["x"], df0["y"], color=colors[color_index], label=f'Class {i}')
 
     plt.xlabel("X")
     plt.ylabel("Y")
     plt.title("Визуализация")
-    plt.grid(True)   # включаем сетку
+    plt.grid(True)
+    plt.legend()
     plt.show()
 
-def main():
-    script_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # папка скрипта
-    file_path = os.path.join(script_dir, "data", "answerAI.csv")
-    plot_answer(file_path)
-
+# Эта часть ОЧЕНЬ ВАЖНА. 
+# Она принимает путь к файлу, который передает программа на C++
 if __name__ == "__main__":
-    main()
+    if len(sys.argv) > 1:
+        csv_path = sys.argv[1]
+        plot_answer(csv_path)
+    else:
+        print("Ошибка: Путь к файлу не передан!")
