@@ -8,4 +8,6 @@ code/vc140.pdb
 .vscode
 .idea
 code/visualization.obj
+code/file_import.obj
+code/matrix_realization.obj
 
