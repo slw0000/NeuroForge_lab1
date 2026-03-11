@@ -17,6 +17,7 @@ void removeTestFile(const std::string& fileName) {
 
 void testFileImportRawCorrect() {
     createTestFile("../data/test_raw.csv",
+        "x, y, label\n"
         "1.1, 0.2, 0\n"
         "0.3, -2.4, 1\n"
         "-0.5, 0.6, 8");
@@ -34,6 +35,7 @@ void testFileImportRawCorrect() {
 
 void testFileImportRawComments() {
     createTestFile("../data/test_comments.csv",
+        "x, y\n"
         "# comment №1\n"
         "1.0, 2.0\n"
         "# another comment\n"
@@ -63,6 +65,7 @@ void testFileImportRawNoFile() {
 
 void testFileImportRawInvalidFormat() {
     createTestFile("../data/test_invalid.csv",
+        "x, y\n"
         "1.0, 2.0\n"
         "abc, def");
 
@@ -81,6 +84,7 @@ void testFileImportRawInvalidFormat() {
 
 void testFileImportMatrixRawCorrect() {
     createTestFile("../data/test_matrix.csv",
+        "x, y\n"
         "0.1, 0.2\n"
         "0.3, 0.4\n"
         "0.5, 0.6");
@@ -98,6 +102,7 @@ void testFileImportMatrixRawCorrect() {
 
 void testFileImportMatrixRawWrongColumnCount() {
     createTestFile("../data/test_wrong_cols.csv",
+        "x, y\n"
         "0.1, 0.2\n"
         "0.3, 0.4, 0.5");
 
@@ -118,6 +123,7 @@ void testFileImportMatrixRawWrongColumnCount() {
 
 void testFileImportMatrixLabelCorrect() {
     createTestFile("../data/test_labeled.csv",
+        "x, y, label\n"
         "-2.1, 3.2, 4\n"
         "9.3, 3.4, 1\n"
         "-4.5, 0.6, 2");
@@ -135,6 +141,7 @@ void testFileImportMatrixLabelCorrect() {
 
 void testFileImportMatrixLabelNonIntegerLabel() {
     createTestFile("../data/test_float_label.csv",
+        "x, y, label\n"
         "0.1, 0.2, 0\n"
         "0.3, 0.4, 0.5");
 
@@ -154,6 +161,7 @@ void testFileImportMatrixLabelNonIntegerLabel() {
 
 void testFileImportMatrixLabelWrongColumnCount() {
     createTestFile("../data/test_wrong_cols2.csv",
+        "x, y, label\n"
         "0.1, 0.2\n"
         "0.3, 0.4, 1");
 
@@ -182,7 +190,7 @@ void testFileSaveToCSVWithoutLabels() {
 
     std::string line;
     std::getline(file, line);
-    assert(line.find("# x, y") != std::string::npos);
+    assert(line.find("x, y") != std::string::npos);
 
     std::getline(file, line);
     assert(line.find("1.3") != std::string::npos);
@@ -207,7 +215,7 @@ void testFileSaveToCSVWithLabels() {
 
     std::string line;
     std::getline(file, line);
-    assert(line.find("# x, y, label") != std::string::npos);
+    assert(line.find("x, y, label") != std::string::npos);
 
     std::getline(file, line);
     assert(line.find("0.5") != std::string::npos);

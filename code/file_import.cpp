@@ -35,6 +35,7 @@ std::vector<std::vector<double>> fileImportRaw(const std::string& fileName) {
     /*
     Записывает данные файла (в формате .csv, т.е. построчно через запятую) в двумерным массив (std::vector).
     Обрабатывает как файлы с метками классов (в виде целого числа), так и без метки.
+    Игнорирует заголовки столбцов таблицы.
     */
 
     std::fstream curFile;
@@ -48,6 +49,8 @@ std::vector<std::vector<double>> fileImportRaw(const std::string& fileName) {
     }
 
     try {
+        if (std::getline(curFile, line)) {}
+
         while (std::getline(curFile, line)) {
 
             if (line.empty() || line[0] == '#') {
@@ -81,6 +84,7 @@ std::vector<Matrix> fileImportMatrixRaw(const std::string& fileName) {
     /*
     Записывает данные файла (в формате .csv, т.е. построчно через запятую)
     в массив Матриц (Matrix). Обрабатывает файлы без меток классов.
+    Игнорирует заголовки столбцов таблицы.
     */
 
     std::fstream curFile;
@@ -94,6 +98,8 @@ std::vector<Matrix> fileImportMatrixRaw(const std::string& fileName) {
     }
 
     try {
+        if (std::getline(curFile, line)) {}
+
         while (std::getline(curFile, line)) {
 
             if (line.empty() || line[0] == '#') {
@@ -134,6 +140,7 @@ std::pair<std::vector<Matrix>, std::vector<int>> fileImportMatrixLabel(const std
     /*
     Записывает данные файла (в формате .csv, т.е. построчно через запятую)
     в пару <массив Матриц (Matrix), массив меток классов (int)>. Обрабатывает файлы c метками классов.
+    Игнорирует заголовки столбцов таблицы.
     */
 
     std::fstream curFile;
@@ -149,6 +156,8 @@ std::pair<std::vector<Matrix>, std::vector<int>> fileImportMatrixLabel(const std
     }
 
     try {
+        if (std::getline(curFile, line)) {}
+
         while (std::getline(curFile, line)) {
 
             if (line.empty() || line[0] == '#') {
@@ -202,9 +211,9 @@ void fileSaveToCSV(const std::string& fileName, const std::vector<Matrix>& cords
     if (!curFile.is_open()) {throw std::runtime_error("Не удаётся открыть файл: " + fileName);}
 
     if (label.empty()) {
-        curFile << "# x, y" << std::endl;
+        curFile << "x, y" << std::endl;
     } else {
-        curFile << "# x, y, label" << std::endl;
+        curFile << "x, y, label" << std::endl;
     }
 
     for (size_t i = 0; i < cords.size(); i++) {
