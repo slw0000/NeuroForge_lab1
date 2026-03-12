@@ -1,3 +1,5 @@
+#include <windows.h>
+
 #include "visualization.h"
 #include <vector>
 
@@ -8,10 +10,16 @@ void runAllMatrixTests();
 void runAllFileImportTests();
 
 int main(int argc, char* argv[]) {
+
+    SetConsoleOutputCP(CP_UTF8); /*это только для моего VScode*/
+    SetConsoleCP(CP_UTF8);       /*это только для моего VScode*/
+
     /*
      Для запуска демонстрации работы класса матриц и утилиты работы с файлами, надо просто запустить программу.
      Для запуска тестирования необходимо запустить программу с конфигурацией "--test".
      */
+
+    viz::plot("data/answerAI.csv");
 
     bool runTests = false;
     for (int i = 1; i < argc; i++) {
@@ -125,8 +133,6 @@ int main(int argc, char* argv[]) {
 
         fileSaveToCSV("../data/saveExample.csv", data4cords, data4label);
         std::cout << "Файл успешно создан!" << std::endl;
-
-        viz::plot("data/answerAI.csv");
 
         return 0;
     }

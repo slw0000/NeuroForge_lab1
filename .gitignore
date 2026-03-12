@@ -10,4 +10,6 @@ code/vc140.pdb
 code/visualization.obj
 code/file_import.obj
 code/matrix_realization.obj
+code/matrix_tests.obj
+code/file_import_tests.obj
 
