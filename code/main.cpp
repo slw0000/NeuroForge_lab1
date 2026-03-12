@@ -1,4 +1,4 @@
-#include <windows.h>
+// #include <windows.h> /* это только для VScode на Windows */
 
 #include "visualization.h"
 #include <vector>
@@ -11,8 +11,8 @@ void runAllFileImportTests();
 
 int main(int argc, char* argv[]) {
 
-    SetConsoleOutputCP(CP_UTF8); /*это только для моего VScode*/
-    SetConsoleCP(CP_UTF8);       /*это только для моего VScode*/
+    // SetConsoleOutputCP(CP_UTF8); /* это только для VScode на Windows */
+    // SetConsoleCP(CP_UTF8);       /* это только для VScode на Windows */
 
     /*
      Для запуска демонстрации работы класса матриц и утилиты работы с файлами, надо просто запустить программу.

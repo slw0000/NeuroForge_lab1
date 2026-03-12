@@ -1,4 +1,3 @@
-CMakeLists.txt
 cmake-build-debug
 code/main.exe
 code/main.ilk
