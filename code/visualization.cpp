@@ -5,6 +5,7 @@
 #include <cstdlib>
 
 namespace viz{
+    /*
     void write_csv(
         const std::string& path,
         const std::vector<std::vector<double>>& data)
@@ -17,7 +18,7 @@ namespace viz{
             return;
         }
 
-        file << "x,y,c\n";
+        file << "x,y,label\n";
 
         for (const auto& row : data)
         {
@@ -30,7 +31,7 @@ namespace viz{
         }
 
         file.close();
-    }
+    }*/
 
 
     void plot(const std::string& path)

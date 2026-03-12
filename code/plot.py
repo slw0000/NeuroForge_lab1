@@ -10,8 +10,8 @@ def plot_answer(path):
     print(f"Работаем с {path}")
     
     # Исправил цикл, чтобы он надежно перебирал все уникальные классы
-    for i in df['c'].unique():
-        df0 = df[df["c"] == i]
+    for i in df['label'].unique():
+        df0 = df[df["label"] == i]
         # Берем цвет из палитры (i % len(colors) не даст выйти за пределы списка цветов)
         color_index = int(i) % len(colors)
         plt.scatter(df0["x"], df0["y"], color=colors[color_index], label=f'Class {i}')

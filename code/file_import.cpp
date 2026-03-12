@@ -206,14 +206,14 @@ void fileSaveToCSV(const std::string& fileName, const std::vector<Matrix>& cords
     if (!label.empty() && (cords.size() != label.size())) {
         throw std::invalid_argument("Размеры массива координат и массива меток классов должны совпадать!");}
 
-    std::ofstream curFile(fileName);
+    std::ofstream curFile(fileName,  std::ios::out | std::ios::trunc);
 
     if (!curFile.is_open()) {throw std::runtime_error("Не удаётся открыть файл: " + fileName);}
 
     if (label.empty()) {
-        curFile << "x, y" << std::endl;
+        curFile << "x,y" << std::endl;
     } else {
-        curFile << "x, y, label" << std::endl;
+        curFile << "x,y,label" << std::endl;
     }
 
     for (size_t i = 0; i < cords.size(); i++) {
@@ -221,9 +221,9 @@ void fileSaveToCSV(const std::string& fileName, const std::vector<Matrix>& cords
             throw std::invalid_argument("Матрица должна быть размером 2x1!");
         }
 
-        curFile << cords[i](0, 0) << ", " << cords[i](1, 0);
+        curFile << cords[i](0, 0) << "," << cords[i](1, 0);
         if (!label.empty()) {
-            curFile << ", " << static_cast<int>(label[i]);
+            curFile << "," << static_cast<int>(label[i]);
         }
 
         curFile << std::endl;
