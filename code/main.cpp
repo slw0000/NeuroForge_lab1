@@ -9,6 +9,8 @@
 void runAllMatrixTests();
 void runAllFileImportTests();
 
+using namespace nnlab;
+
 int main(int argc, char* argv[]) {
 
     // SetConsoleOutputCP(CP_UTF8); /* это только для VScode на Windows */
@@ -117,7 +119,7 @@ int main(int argc, char* argv[]) {
 
         std::cout << "Считывание в пару <массив матриц, массив меток класса>:" << std::endl;
         auto data3 = fileImportMatrixLabel("data/exampleLabel.csv");
-        for (int i; i < data3.first.size(); i++) {
+        for (size_t i = 0; i < data3.first.size(); i++) {
             std::cout << data3.first[i] << data3.second[i] << std::endl;
         }
 
@@ -134,7 +136,7 @@ int main(int argc, char* argv[]) {
         fileSaveToCSV("data/saveExample.csv", data4cords, data4label);
         std::cout << "Файл успешно создан!" << std::endl;
 
-        viz::plot("data/saveExample.csv");
+        plot("data/exampleLabel.csv");
 
         return 0;
     }

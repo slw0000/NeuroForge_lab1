@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 
-void fileToConsole(const std::string& fileName) {
+void nnlab::fileToConsole(const std::string& fileName) {
     /* Построчно выводит в консоль содержимое текстового файла */
 
     std::fstream curFile;
@@ -31,7 +31,7 @@ void fileToConsole(const std::string& fileName) {
     }
 }
 
-std::vector<std::vector<double>> fileImportRaw(const std::string& fileName) {
+std::vector<std::vector<double>> nnlab::fileImportRaw(const std::string& fileName) {
     /*
     Записывает данные файла (в формате .csv, т.е. построчно через запятую) в двумерным массив (std::vector).
     Обрабатывает как файлы с метками классов (в виде целого числа), так и без метки.
@@ -49,7 +49,8 @@ std::vector<std::vector<double>> fileImportRaw(const std::string& fileName) {
     }
 
     try {
-        if (std::getline(curFile, line)) {}
+
+        std::getline(curFile, line);
 
         while (std::getline(curFile, line)) {
 
@@ -80,7 +81,7 @@ std::vector<std::vector<double>> fileImportRaw(const std::string& fileName) {
     }
 }
 
-std::vector<Matrix> fileImportMatrixRaw(const std::string& fileName) {
+std::vector<nnlab::Matrix> nnlab::fileImportMatrixRaw(const std::string& fileName) {
     /*
     Записывает данные файла (в формате .csv, т.е. построчно через запятую)
     в массив Матриц (Matrix). Обрабатывает файлы без меток классов.
@@ -98,7 +99,8 @@ std::vector<Matrix> fileImportMatrixRaw(const std::string& fileName) {
     }
 
     try {
-        if (std::getline(curFile, line)) {}
+
+        std::getline(curFile, line);
 
         while (std::getline(curFile, line)) {
 
@@ -136,7 +138,7 @@ std::vector<Matrix> fileImportMatrixRaw(const std::string& fileName) {
     }
 }
 
-std::pair<std::vector<Matrix>, std::vector<int>> fileImportMatrixLabel(const std::string& fileName) {
+std::pair<std::vector<nnlab::Matrix>, std::vector<int>> nnlab::fileImportMatrixLabel(const std::string& fileName) {
     /*
     Записывает данные файла (в формате .csv, т.е. построчно через запятую)
     в пару <массив Матриц (Matrix), массив меток классов (int)>. Обрабатывает файлы c метками классов.
@@ -156,7 +158,8 @@ std::pair<std::vector<Matrix>, std::vector<int>> fileImportMatrixLabel(const std
     }
 
     try {
-        if (std::getline(curFile, line)) {}
+
+        std::getline(curFile, line);
 
         while (std::getline(curFile, line)) {
 
@@ -199,7 +202,7 @@ std::pair<std::vector<Matrix>, std::vector<int>> fileImportMatrixLabel(const std
     }
 }
 
-void fileSaveToCSV(const std::string& fileName, const std::vector<Matrix>& cords, const std::vector<int>& label) {
+void nnlab::fileSaveToCSV(const std::string& fileName, const std::vector<nnlab::Matrix>& cords, const std::vector<int>& label) {
     /* Сохраняет координаты (как с метками классов так и без) в текстовый файл в формате csv. */
     if (cords.empty()) {
         throw std::invalid_argument("Массив координат не может быть пустым!");}

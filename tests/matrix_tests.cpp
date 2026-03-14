@@ -2,6 +2,8 @@
 #include <iostream>
 #include "../code/matrix_realization.h"
 
+using namespace nnlab;
+
 void assertDoubleEquals(double actual, double expected, double tolerance= 0.000) {
     if (std::abs(actual - expected) > tolerance) {
         std::cerr << "Mistake, expected: " << expected
