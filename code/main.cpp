@@ -1,4 +1,7 @@
-#include <iostream>
+// #include <windows.h> /* это только для VScode на Windows */
+
+#include "visualization.h"
+#include <vector>
 
 #include "matrix_realization.h"
 #include "file_import.h"
@@ -7,10 +10,16 @@ void runAllMatrixTests();
 void runAllFileImportTests();
 
 int main(int argc, char* argv[]) {
+
+    // SetConsoleOutputCP(CP_UTF8); /* это только для VScode на Windows */
+    // SetConsoleCP(CP_UTF8);       /* это только для VScode на Windows */
+
     /*
      Для запуска демонстрации работы класса матриц и утилиты работы с файлами, надо просто запустить программу.
      Для запуска тестирования необходимо запустить программу с конфигурацией "--test".
-     */
+    */
+
+    
 
     bool runTests = false;
     for (int i = 1; i < argc; i++) {
@@ -91,23 +100,23 @@ int main(int argc, char* argv[]) {
         */
 
 
-        fileToConsole("../data/example.txt");
-        fileToConsole("../data/example.csv");
+        fileToConsole("data/example.txt");
+        fileToConsole("data/example.csv");
 
         std::cout << "Считывание в двумерный массив:" << std::endl;
-        auto data = fileImportRaw("../data/example.csv");
+        auto data = fileImportRaw("data/example.csv");
         for (auto& row : data) {
             std::cout << row[0] << " " << row[1] << std::endl;
         }
 
         std::cout << "Считывание в массив матриц:" << std::endl;
-        auto data2 = fileImportMatrixRaw("../data/example.csv");
+        auto data2 = fileImportMatrixRaw("data/example.csv");
         for (auto& row : data2) {
             std::cout << row << std::endl;
         }
 
         std::cout << "Считывание в пару <массив матриц, массив меток класса>:" << std::endl;
-        auto data3 = fileImportMatrixLabel("../data/exampleLabel.csv");
+        auto data3 = fileImportMatrixLabel("data/exampleLabel.csv");
         for (int i; i < data3.first.size(); i++) {
             std::cout << data3.first[i] << data3.second[i] << std::endl;
         }
@@ -122,9 +131,12 @@ int main(int argc, char* argv[]) {
         std::cout << data4cords[0] << " " << data4cords[1] << " " << data4cords[2] << std::endl;
         std::cout << data4label[0] << " " << data4label[1] << " " << data4label[2] << std::endl;
 
-        fileSaveToCSV("../data/saveExample.csv", data4cords, data4label);
+        fileSaveToCSV("data/saveExample.csv", data4cords, data4label);
         std::cout << "Файл успешно создан!" << std::endl;
+
+        viz::plot("data/saveExample.csv");
 
         return 0;
     }
 }
+
