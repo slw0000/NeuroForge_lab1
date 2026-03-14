@@ -1,10 +1,11 @@
 // #include <windows.h> /* это только для VScode на Windows */
 
-#include "visualization.h"
 #include <vector>
 
 #include "matrix_realization.h"
 #include "file_import.h"
+#include "visualization.h"
+#include "utils.h"
 
 void runAllMatrixTests();
 void runAllFileImportTests();
@@ -134,9 +135,28 @@ int main(int argc, char* argv[]) {
         std::cout << data4label[0] << " " << data4label[1] << " " << data4label[2] << std::endl;
 
         fileSaveToCSV("data/saveExample.csv", data4cords, data4label);
-        std::cout << "Файл успешно создан!" << std::endl;
+        std::cout << "Файл успешно создан!\n" << std::endl;
+
+        /*
+        ====== Пример использования утилиты генерации датасета ======
+        */
+
+        std::cout << "Генерация датасета:" << std::endl;
+        auto dataset = genBinClassifyDataset(10);
+        for (size_t i = 0; i < dataset.first.size(); i++) {
+            std::cout << dataset.first[i] << dataset.second[i] << std::endl;
+        }
+        std::cout << "Генерация завершена!\n" << std::endl;
+
+        /*
+        ====== Пример использования утилиты отрисовки содержимого датасета ======
+        */
+
+        std::cout << "Построение графиков!" << std::endl;
 
         plot("data/exampleLabel.csv");
+        fileSaveToCSV("data/exampleGen.csv", dataset.first, dataset.second);
+        plot("data/exampleGen.csv");
 
         return 0;
     }

@@ -11,6 +11,8 @@ add_executable(main code/main.cpp
         code/matrix_realization.h
         code/visualization.cpp
         code/visualization.h
+        code/utils.cpp
+        code/utils.h
         tests/matrix_tests.cpp
         tests/file_Import_tests.cpp
 )
