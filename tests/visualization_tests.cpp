@@ -21,7 +21,7 @@ void testVisualizationCorrect()
         "-0.5,0.6");
     try
     {
-        viz::plot("data/test_no_label.csv");
+        nnlab::plot("data/test_no_label.csv");
         std::cout << "Test visualization correct CSV - OK\n";
     }
     catch (...)
@@ -41,7 +41,7 @@ void testVisualizationWithLabels()
 
     try
     {
-        viz::plot("data/test_with_label.csv");
+        nnlab::plot("data/test_with_label.csv");
         std::cout << "Test visualization with labels - OK\n";
     }
     catch (...)
@@ -61,7 +61,7 @@ void testVisualizationWithLabelsWithLeg0()
 
     try
     {
-        viz::plot("data/test_with_label.csv 0");
+        nnlab::plot("data/test_with_label.csv 0");
         std::cout << "Test visualization with labels no legend - OK\n";
     }
     catch (...)
@@ -81,7 +81,7 @@ void testVisualizationWithLabelsWithLeg1()
 
     try
     {
-        viz::plot("data/test_with_label.csv 1");
+        nnlab::plot("data/test_with_label.csv 1");
         std::cout << "Test visualization with labels with legend - OK\n";
     }
     catch (...)
@@ -95,7 +95,7 @@ void testVisualizationWrongPath()
 {
     try
     {
-        viz::plot("not_existing_file.csv");
+        nnlab::plot("not_existing_file.csv");
         std::cout << "Test visualization wrong path - FAIL\n";
     }
     catch (...)

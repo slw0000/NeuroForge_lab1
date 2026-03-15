@@ -15,6 +15,7 @@ add_executable(main code/main.cpp
         code/utils.h
         tests/matrix_tests.cpp
         tests/file_Import_tests.cpp
+        tests/visualization_tests.cpp
 )
 
 file(COPY ${CMAKE_SOURCE_DIR}/data

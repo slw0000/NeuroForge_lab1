@@ -170,6 +170,7 @@ int main(int argc, char* argv[]) {
         plot("data/exampleLabel.csv");
         fileSaveToCSV("data/exampleGen.csv", dataset.first, dataset.second);
         plot("data/exampleGen.csv");
+        plot("data/example.csv");
 
         return 0;
     }
