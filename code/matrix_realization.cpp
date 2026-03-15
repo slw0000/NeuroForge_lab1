@@ -5,28 +5,28 @@
 #include <iomanip>
 #include <stdexcept>
 
-Matrix::Matrix(size_t rows, size_t cols, double value)
+nnlab::Matrix::Matrix(size_t rows, size_t cols, double value)
     : rows_(rows), cols_(cols), data_(rows * cols, value){
     if (rows == 0 || cols == 0) {
         throw std::invalid_argument("Matrix size cannot be zero");
     }
 }
 
-double& Matrix::operator()(size_t i, size_t j) {
+double& nnlab::Matrix::operator()(size_t i, size_t j) {
     if (i >= rows_ || j >= cols_) {
         throw std::out_of_range("Matrix index out of range");
     }
     return data_[i * cols_ + j];
 }
 
-const double& Matrix::operator()(size_t i, size_t j) const {
+const double& nnlab::Matrix::operator()(size_t i, size_t j) const {
     if (i >= rows_ || j >= cols_) {
         throw std::out_of_range("Matrix index out of range");
     }
     return data_[i * cols_ + j];
 }
 
-Matrix Matrix::operator+(const Matrix& other) const {
+nnlab::Matrix nnlab::Matrix::operator+(const Matrix& other) const {
     if (rows_ != other.rows_ || cols_ != other.cols_) {
         throw std::invalid_argument("Matrix size does not match");
     }
@@ -37,7 +37,7 @@ Matrix Matrix::operator+(const Matrix& other) const {
     return result;
 }
 
-Matrix Matrix::operator-(const Matrix& other) const {
+nnlab::Matrix nnlab::Matrix::operator-(const Matrix& other) const {
     if (rows_ != other.rows_ || cols_ != other.cols_) {
         throw std::invalid_argument("Matrix size does not match");
     }
@@ -48,7 +48,7 @@ Matrix Matrix::operator-(const Matrix& other) const {
     return result;
 }
 
-Matrix Matrix::operator*(const Matrix& other) const {
+nnlab::Matrix nnlab::Matrix::operator*(const Matrix& other) const {
     if (cols_ != other.rows_) {
         throw std::invalid_argument("Matrices can't be multiply");
     }
@@ -63,7 +63,7 @@ Matrix Matrix::operator*(const Matrix& other) const {
     return result;
 }
 
-Matrix Matrix::operator*(double scalar) const {
+nnlab::Matrix nnlab::Matrix::operator*(double scalar) const {
     Matrix result(rows_, cols_, 0.0);
     for (size_t i = 0; i < data_.size(); ++i) {
         result.data_[i] = data_[i] * scalar;
@@ -71,7 +71,7 @@ Matrix Matrix::operator*(double scalar) const {
     return result;
 }
 
-Matrix Matrix::transpose() const {
+nnlab::Matrix nnlab::Matrix::transpose() const {
     Matrix result(cols_, rows_, 0.0);
     for (size_t i = 0; i < rows_; i++) {
         for (size_t j = 0; j < cols_; j++) {
@@ -81,14 +81,15 @@ Matrix Matrix::transpose() const {
     return result;
 }
 
-std::ostream& operator<<(std::ostream& os, const Matrix& m) {
-    for (size_t i = 0; i < m.rows_; i++) {
-        for (size_t j = 0; j < m.cols_; j++) {
-            os << std::setw(10) << std::fixed << std::setprecision(2) << m(i, j) << " ";
+namespace nnlab {
+    std::ostream& operator<<(std::ostream& os, const nnlab::Matrix& m) {
+        for (size_t i = 0; i < m.rows_; i++) {
+            for (size_t j = 0; j < m.cols_; j++) {
+                os << std::setw(10) << std::fixed << std::setprecision(2) << m(i, j) << " ";
+            }
+            os << "\n";
         }
-        os << "\n";
+        return os;
     }
-    return os;
 }
-
 

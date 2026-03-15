@@ -1,18 +1,23 @@
-#include <windows.h> /* это только для VScode на Windows */
+// #include <windows.h> /* это только для VScode на Windows */
+
 #include <vector>
 
 #include "visualization.h"
 #include "matrix_realization.h"
 #include "file_import.h"
+#include "visualization.h"
+#include "utils.h"
 
 void runAllMatrixTests();
 void runAllFileImportTests();
 void runVisualizationTests();
 
+using namespace nnlab;
+
 int main(int argc, char* argv[]) {
 
-    SetConsoleOutputCP(CP_UTF8); /* это только для VScode на Windows */
-    SetConsoleCP(CP_UTF8);       /* это только для VScode на Windows */
+    // SetConsoleOutputCP(CP_UTF8); /* это только для VScode на Windows */
+    // SetConsoleCP(CP_UTF8);       /* это только для VScode на Windows */
 
     /*
      Для запуска демонстрации работы класса матриц и утилиты работы с файлами, надо просто запустить программу.
@@ -127,7 +132,7 @@ int main(int argc, char* argv[]) {
 
         std::cout << "Считывание в пару <массив матриц, массив меток класса>:" << std::endl;
         auto data3 = fileImportMatrixLabel("data/exampleLabel.csv");
-        for (int i; i < data3.first.size(); i++) {
+        for (size_t i = 0; i < data3.first.size(); i++) {
             std::cout << data3.first[i] << data3.second[i] << std::endl;
         }
 
@@ -142,10 +147,29 @@ int main(int argc, char* argv[]) {
         std::cout << data4label[0] << " " << data4label[1] << " " << data4label[2] << std::endl;
 
         fileSaveToCSV("data/saveExample.csv", data4cords, data4label);
-        std::cout << "Файл успешно создан!" << std::endl;
+        std::cout << "Файл успешно создан!\n" << std::endl;
 
-        viz::plot("data/saveExample.csv 1");
-        viz::plot("data/example.csv");
+
+        /*
+        ====== Пример использования утилиты генерации датасета ======
+        */
+
+        std::cout << "Генерация датасета:" << std::endl;
+        auto dataset = genBinClassifyDataset(10);
+        for (size_t i = 0; i < dataset.first.size(); i++) {
+            std::cout << dataset.first[i] << dataset.second[i] << std::endl;
+        }
+        std::cout << "Генерация завершена!\n" << std::endl;
+
+        /*
+        ====== Пример использования утилиты отрисовки содержимого датасета ======
+        */
+
+        std::cout << "Построение графиков!" << std::endl;
+
+        plot("data/exampleLabel.csv");
+        fileSaveToCSV("data/exampleGen.csv", dataset.first, dataset.second);
+        plot("data/exampleGen.csv");
 
         return 0;
     }

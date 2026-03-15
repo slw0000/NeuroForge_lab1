@@ -5,6 +5,8 @@
 #include "../code/file_import.h"
 #include "../code/matrix_realization.h"
 
+using namespace nnlab;
+
 void createTestFile(const std::string& fileName, const std::string& fileContent) {
     std::ofstream file(fileName);
     file << fileContent;
