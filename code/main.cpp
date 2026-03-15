@@ -1,18 +1,18 @@
-// #include <windows.h> /* это только для VScode на Windows */
-
-#include "visualization.h"
+#include <windows.h> /* это только для VScode на Windows */
 #include <vector>
 
+#include "visualization.h"
 #include "matrix_realization.h"
 #include "file_import.h"
 
 void runAllMatrixTests();
 void runAllFileImportTests();
+void runVisualizationTests();
 
 int main(int argc, char* argv[]) {
 
-    // SetConsoleOutputCP(CP_UTF8); /* это только для VScode на Windows */
-    // SetConsoleCP(CP_UTF8);       /* это только для VScode на Windows */
+    SetConsoleOutputCP(CP_UTF8); /* это только для VScode на Windows */
+    SetConsoleCP(CP_UTF8);       /* это только для VScode на Windows */
 
     /*
      Для запуска демонстрации работы класса матриц и утилиты работы с файлами, надо просто запустить программу.
@@ -44,6 +44,16 @@ int main(int argc, char* argv[]) {
         std::cout << "\nFile import tests: \n" << std::endl;
         try {
             runAllFileImportTests();
+        } catch (const std::exception& e) {
+            std::cerr << "Error: " << e.what() << std::endl;
+            return 1;
+        } catch (...) {
+            std::cerr << "Unknown error" << std::endl;
+            return 1;
+        }
+        std::cout << "\nVisualization tests: \n" << std::endl;
+        try {
+            runVisualizationTests();
         } catch (const std::exception& e) {
             std::cerr << "Error: " << e.what() << std::endl;
             return 1;
@@ -134,7 +144,8 @@ int main(int argc, char* argv[]) {
         fileSaveToCSV("data/saveExample.csv", data4cords, data4label);
         std::cout << "Файл успешно создан!" << std::endl;
 
-        viz::plot("data/saveExample.csv");
+        viz::plot("data/saveExample.csv 1");
+        viz::plot("data/example.csv");
 
         return 0;
     }
