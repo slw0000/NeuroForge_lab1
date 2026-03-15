@@ -5,7 +5,7 @@
 #include <fstream>
 #include <sstream>
 
-void fileToConsole(const std::string& fileName) {
+void nnlab::fileToConsole(const std::string& fileName) {
     /* Построчно выводит в консоль содержимое текстового файла */
 
     std::fstream curFile;
@@ -31,10 +31,11 @@ void fileToConsole(const std::string& fileName) {
     }
 }
 
-std::vector<std::vector<double>> fileImportRaw(const std::string& fileName) {
+std::vector<std::vector<double>> nnlab::fileImportRaw(const std::string& fileName) {
     /*
     Записывает данные файла (в формате .csv, т.е. построчно через запятую) в двумерным массив (std::vector).
     Обрабатывает как файлы с метками классов (в виде целого числа), так и без метки.
+    Игнорирует заголовки столбцов таблицы.
     */
 
     std::fstream curFile;
@@ -48,6 +49,9 @@ std::vector<std::vector<double>> fileImportRaw(const std::string& fileName) {
     }
 
     try {
+
+        std::getline(curFile, line);
+
         while (std::getline(curFile, line)) {
 
             if (line.empty() || line[0] == '#') {
@@ -77,10 +81,11 @@ std::vector<std::vector<double>> fileImportRaw(const std::string& fileName) {
     }
 }
 
-std::vector<Matrix> fileImportMatrixRaw(const std::string& fileName) {
+std::vector<nnlab::Matrix> nnlab::fileImportMatrixRaw(const std::string& fileName) {
     /*
     Записывает данные файла (в формате .csv, т.е. построчно через запятую)
     в массив Матриц (Matrix). Обрабатывает файлы без меток классов.
+    Игнорирует заголовки столбцов таблицы.
     */
 
     std::fstream curFile;
@@ -94,6 +99,9 @@ std::vector<Matrix> fileImportMatrixRaw(const std::string& fileName) {
     }
 
     try {
+
+        std::getline(curFile, line);
+
         while (std::getline(curFile, line)) {
 
             if (line.empty() || line[0] == '#') {
@@ -130,10 +138,11 @@ std::vector<Matrix> fileImportMatrixRaw(const std::string& fileName) {
     }
 }
 
-std::pair<std::vector<Matrix>, std::vector<int>> fileImportMatrixLabel(const std::string& fileName) {
+std::pair<std::vector<nnlab::Matrix>, std::vector<int>> nnlab::fileImportMatrixLabel(const std::string& fileName) {
     /*
     Записывает данные файла (в формате .csv, т.е. построчно через запятую)
     в пару <массив Матриц (Matrix), массив меток классов (int)>. Обрабатывает файлы c метками классов.
+    Игнорирует заголовки столбцов таблицы.
     */
 
     std::fstream curFile;
@@ -149,6 +158,9 @@ std::pair<std::vector<Matrix>, std::vector<int>> fileImportMatrixLabel(const std
     }
 
     try {
+
+        std::getline(curFile, line);
+
         while (std::getline(curFile, line)) {
 
             if (line.empty() || line[0] == '#') {
@@ -190,21 +202,21 @@ std::pair<std::vector<Matrix>, std::vector<int>> fileImportMatrixLabel(const std
     }
 }
 
-void fileSaveToCSV(const std::string& fileName, const std::vector<Matrix>& cords, const std::vector<int>& label) {
+void nnlab::fileSaveToCSV(const std::string& fileName, const std::vector<nnlab::Matrix>& cords, const std::vector<int>& label) {
     /* Сохраняет координаты (как с метками классов так и без) в текстовый файл в формате csv. */
     if (cords.empty()) {
         throw std::invalid_argument("Массив координат не может быть пустым!");}
     if (!label.empty() && (cords.size() != label.size())) {
         throw std::invalid_argument("Размеры массива координат и массива меток классов должны совпадать!");}
 
-    std::ofstream curFile(fileName);
+    std::ofstream curFile(fileName,  std::ios::out | std::ios::trunc);
 
     if (!curFile.is_open()) {throw std::runtime_error("Не удаётся открыть файл: " + fileName);}
 
     if (label.empty()) {
-        curFile << "# x, y" << std::endl;
+        curFile << "x,y" << std::endl;
     } else {
-        curFile << "# x, y, label" << std::endl;
+        curFile << "x,y,label" << std::endl;
     }
 
     for (size_t i = 0; i < cords.size(); i++) {
@@ -212,9 +224,9 @@ void fileSaveToCSV(const std::string& fileName, const std::vector<Matrix>& cords
             throw std::invalid_argument("Матрица должна быть размером 2x1!");
         }
 
-        curFile << cords[i](0, 0) << ", " << cords[i](1, 0);
+        curFile << cords[i](0, 0) << "," << cords[i](1, 0);
         if (!label.empty()) {
-            curFile << ", " << static_cast<int>(label[i]);
+            curFile << "," << static_cast<int>(label[i]);
         }
 
         curFile << std::endl;

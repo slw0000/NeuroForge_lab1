@@ -1,3 +1,16 @@
 CMakeLists.txt
 cmake-build-debug
+code/main.exe
+code/main.ilk
+code/main.obj
+code/main.pdb
+code/vc140.pdb
+.vscode
 .idea
+code/visualization.obj
+code/file_import.obj
+code/matrix_realization.obj
+code/matrix_tests.obj
+code/file_import_tests.obj
+code/visualization_tests.obj
+
