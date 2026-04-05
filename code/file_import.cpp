@@ -5,30 +5,56 @@
 #include <fstream>
 #include <sstream>
 
+
+namespace helperFuncs{
+    std::fstream safeFileOpening(const std::string& fileName) {
+        std::fstream curFile;
+        curFile.open(fileName);
+
+        if (!curFile.is_open()) {
+            throw std::runtime_error("Не удаётся открыть файл: " + fileName);
+        }
+        return curFile;
+    };
+
+    std::vector<std::vector<double>> simpleParser(std::fstream& curFile) {
+
+        std::string line;
+        std::vector<std::vector<double>> data;
+
+        while (std::getline(curFile, line)) {
+            if (line.empty()) { continue; }
+
+            std::vector<double> row;
+            std::stringstream ss(line);
+            std::string num;
+
+            try {
+                while (std::getline(ss, num, ',')) {
+                    row.push_back(std::stod(num));
+                }
+            } catch (...) { throw std::invalid_argument("Неверный формат данных в строке: " + line); }
+
+            data.push_back(row);
+        }
+        return data;
+    }
+
+}
+
+
 void nnlab::fileToConsole(const std::string& fileName) {
     /* Построчно выводит в консоль содержимое текстового файла */
 
-    std::fstream curFile;
     std::string line;
+    auto curFile = helperFuncs::safeFileOpening(fileName);
 
-    curFile.open(fileName);
-
-    if (!curFile.is_open()) {
-        throw std::runtime_error("Не удаётся открыть файл: " + fileName);
+    std::cout << "=== Файл открыт: " << fileName <<" ===" << std::endl;
+    while (std::getline(curFile, line)) {
+        std::cout << line << std::endl;
     }
+    std::cout << "=== Файл закрыт! ===\n" << std::endl;
 
-    try {
-
-        std::cout << "=== Файл открыт: " << fileName <<" ===" << std::endl;
-        while (std::getline(curFile, line)) {
-            std::cout << line << std::endl;
-        }
-
-        std::cout << "=== Файл закрыт! ===\n" << std::endl;
-
-    } catch (...) {
-        throw std::runtime_error("Ошибка при открытии файла!");
-    }
 }
 
 std::vector<std::vector<double>> nnlab::fileImportRaw(const std::string& fileName) {
@@ -38,47 +64,16 @@ std::vector<std::vector<double>> nnlab::fileImportRaw(const std::string& fileNam
     Игнорирует заголовки столбцов таблицы.
     */
 
-    std::fstream curFile;
     std::string line;
     std::vector<std::vector<double>> data;
 
-    curFile.open(fileName);
+    auto curFile = helperFuncs::safeFileOpening(fileName);
+    std::getline(curFile, line);
 
-    if (!curFile.is_open()) {
-        throw std::runtime_error("Не удаётся открыть файл: " + fileName);
-    }
+    data = helperFuncs::simpleParser(curFile);
 
-    try {
+    return data;
 
-        std::getline(curFile, line);
-
-        while (std::getline(curFile, line)) {
-
-            if (line.empty() || line[0] == '#') {
-                continue;
-            }
-
-            std::vector<double> row;
-            std::stringstream ss(line);
-            std::string num;
-
-            try {
-                while (std::getline(ss, num, ',')) {
-                    row.push_back(std::stod(num));
-                }
-            } catch (...) {
-                throw std::invalid_argument("неверный формат данных!");
-            }
-
-            data.push_back(row);
-
-        }
-        return data;
-    } catch (const std::runtime_error& error_message) {
-        throw std::runtime_error("Ошибка при открытии файла: " + std::string(error_message.what()));
-    } catch (const std::invalid_argument& error_message) {
-        throw std::invalid_argument("Ошибка при открытии файла: " + std::string(error_message.what()));
-    }
 }
 
 std::vector<nnlab::Matrix> nnlab::fileImportMatrixRaw(const std::string& fileName) {
@@ -88,54 +83,24 @@ std::vector<nnlab::Matrix> nnlab::fileImportMatrixRaw(const std::string& fileNam
     Игнорирует заголовки столбцов таблицы.
     */
 
-    std::fstream curFile;
     std::string line;
     std::vector<Matrix> data;
+    Matrix cords(2, 1);
 
-    curFile.open(fileName);
+    auto curFile = helperFuncs::safeFileOpening(fileName);
+    std::getline(curFile, line);
 
-    if (!curFile.is_open()) {
-        throw std::runtime_error("Не удаётся открыть файл: " + fileName);
-    }
-
-    try {
-
-        std::getline(curFile, line);
-
-        while (std::getline(curFile, line)) {
-
-            if (line.empty() || line[0] == '#') {
-                continue;
-            }
-
-            std::vector<double> row;
-            Matrix cords(2, 1);
-            std::stringstream ss(line);
-            std::string num;
-
-            try {
-                while (std::getline(ss, num, ',')) {
-                    row.push_back(std::stod(num));
-                }
-            } catch (...) {
-                throw std::invalid_argument("неверный формат данных!");
-            }
-
-            if (row.size() == 2) {
-                cords(0, 0) = row[0];
-                cords(1, 0) = row[1];
-                data.push_back(cords);
-            } else {
-                throw std::invalid_argument("количество чисел в строке не равно 2!");
-            }
-
+    for (const auto& row: helperFuncs::simpleParser(curFile)) {
+        if (row.size() == 2) {
+            cords(0, 0) = row[0];
+            cords(1, 0) = row[1];
+            data.push_back(cords);
+        } else {
+            throw std::invalid_argument("Количество чисел в строке не равно 2!");
         }
-        return data;
-    } catch (const std::runtime_error& error_message) {
-        throw std::runtime_error("Ошибка при открытии файла: " + std::string(error_message.what()));
-    } catch (const std::invalid_argument& error_message) {
-        throw std::invalid_argument("Ошибка при открытии файла: " + std::string(error_message.what()));
     }
+
+    return data;
 }
 
 std::pair<std::vector<nnlab::Matrix>, std::vector<int>> nnlab::fileImportMatrixLabel(const std::string& fileName) {
@@ -145,79 +110,44 @@ std::pair<std::vector<nnlab::Matrix>, std::vector<int>> nnlab::fileImportMatrixL
     Игнорирует заголовки столбцов таблицы.
     */
 
-    std::fstream curFile;
     std::string line;
     std::vector<Matrix> dataCords;
     std::vector<int> dataLabels;
+    Matrix cords(2, 1);
     const double eps = 1e-6;
 
-    curFile.open(fileName);
+    auto curFile = helperFuncs::safeFileOpening(fileName);
+    std::getline(curFile, line);
 
-    if (!curFile.is_open()) {
-        throw std::runtime_error("Не удаётся открыть файл: " + fileName);
+    for (const auto& row: helperFuncs::simpleParser(curFile)) {
+        if (row.size() == 3) {
+            cords(0, 0) = row[0];
+            cords(1, 0) = row[1];
+            dataCords.push_back(cords);
+
+            if (std::abs(std::round(row[2]) - row[2]) < eps) {
+                dataLabels.emplace_back(int(row[2]));
+            } else { throw std::invalid_argument("Метка класса должна быть целым числом: " + std::to_string(row[2])); }
+        } else { throw std::invalid_argument("Количество чисел в строке не равно 3!"); }
     }
 
-    try {
-
-        std::getline(curFile, line);
-
-        while (std::getline(curFile, line)) {
-
-            if (line.empty() || line[0] == '#') {
-                continue;
-            }
-
-            std::vector<double> row;
-            Matrix cords(2, 1);
-            std::stringstream ss(line);
-            std::string num;
-
-            try {
-                while (std::getline(ss, num, ',')) {
-                    row.push_back(std::stod(num));
-                }
-            } catch (...) {
-                throw std::invalid_argument("неверный формат данных!");
-            }
-
-            if (row.size() == 3) {
-                cords(0, 0) = row[0];
-                cords(1, 0) = row[1];
-                dataCords.push_back(cords);
-                if (std::abs(std::round(row[2]) - row[2]) < eps) {
-                    dataLabels.emplace_back(int(row[2]));
-                } else {
-                    throw std::invalid_argument("метка класса должна быть целым числом!");
-                }
-            } else {
-                throw std::invalid_argument("количество чисел в строке не равно 3!");
-            }
-
-        }
-        return std::make_pair(dataCords, dataLabels);
-    } catch (const std::runtime_error& error_message) {
-        throw std::runtime_error("Ошибка при открытии файла: " + std::string(error_message.what()));
-    } catch (const std::invalid_argument& error_message) {
-        throw std::invalid_argument("Ошибка при открытии файла: " + std::string(error_message.what()));
-    }
+    return std::make_pair(dataCords, dataLabels);
 }
 
 void nnlab::fileSaveToCSV(const std::string& fileName, const std::vector<nnlab::Matrix>& cords, const std::vector<int>& label) {
     /* Сохраняет координаты (как с метками классов так и без) в текстовый файл в формате csv. */
-    if (cords.empty()) {
-        throw std::invalid_argument("Массив координат не может быть пустым!");}
+
+    if (cords.empty()) { throw std::invalid_argument("Массив координат не может быть пустым!"); }
     if (!label.empty() && (cords.size() != label.size())) {
-        throw std::invalid_argument("Размеры массива координат и массива меток классов должны совпадать!");}
+        throw std::invalid_argument("Размеры массива координат и массива меток классов должны совпадать!");
+    }
 
     std::ofstream curFile(fileName,  std::ios::out | std::ios::trunc);
 
     if (!curFile.is_open()) {throw std::runtime_error("Не удаётся открыть файл: " + fileName);}
 
-    if (label.empty()) {
-        curFile << "x,y" << std::endl;
-    } else {
-        curFile << "x,y,label" << std::endl;
-    }
+    if (label.empty()) { curFile << "x,y" << std::endl;
+    } else { curFile << "x,y,label" << std::endl; }
 
     for (size_t i = 0; i < cords.size(); i++) {
         if (cords[i].rows() != 2 || cords[i].cols() != 1) {
@@ -225,9 +155,7 @@ void nnlab::fileSaveToCSV(const std::string& fileName, const std::vector<nnlab::
         }
 
         curFile << cords[i](0, 0) << "," << cords[i](1, 0);
-        if (!label.empty()) {
-            curFile << "," << static_cast<int>(label[i]);
-        }
+        if (!label.empty()) { curFile << "," << label[i]; }
 
         curFile << std::endl;
     }
