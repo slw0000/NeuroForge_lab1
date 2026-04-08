@@ -2,13 +2,14 @@
 
 #include <vector>
 
-#include "matrix_realization.h"
-#include "file_import.h"
-#include "visualization.h"
-#include "utils.h"
+#include "../include/visualization.h"
+#include "../include/matrix_realization.h"
+#include "../include/file_import.h"
+#include "../include/utils.h"
 
 void runAllMatrixTests();
 void runAllFileImportTests();
+void runVisualizationTests();
 
 using namespace nnlab;
 
@@ -47,6 +48,16 @@ int main(int argc, char* argv[]) {
         std::cout << "\nFile import tests: \n" << std::endl;
         try {
             runAllFileImportTests();
+        } catch (const std::exception& e) {
+            std::cerr << "Error: " << e.what() << std::endl;
+            return 1;
+        } catch (...) {
+            std::cerr << "Unknown error" << std::endl;
+            return 1;
+        }
+        std::cout << "\nVisualization tests: \n" << std::endl;
+        try {
+            runVisualizationTests();
         } catch (const std::exception& e) {
             std::cerr << "Error: " << e.what() << std::endl;
             return 1;
@@ -137,6 +148,7 @@ int main(int argc, char* argv[]) {
         fileSaveToCSV("data/saveExample.csv", data4cords, data4label);
         std::cout << "Файл успешно создан!\n" << std::endl;
 
+
         /*
         ====== Пример использования утилиты генерации датасета ======
         */
@@ -157,6 +169,7 @@ int main(int argc, char* argv[]) {
         plot("data/exampleLabel.csv");
         fileSaveToCSV("data/exampleGen.csv", dataset.first, dataset.second);
         plot("data/exampleGen.csv");
+        plot("data/example.csv");
 
         return 0;
     }

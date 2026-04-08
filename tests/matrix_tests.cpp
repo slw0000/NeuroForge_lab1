@@ -1,6 +1,6 @@
 #include <cassert>
 #include <iostream>
-#include "../code/matrix_realization.h"
+#include "../include/matrix_realization.h"
 
 using namespace nnlab;
 

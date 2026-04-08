@@ -1,18 +1,19 @@
-#include "visualization.h"
+#include "../include/visualization.h"
 
 #include <fstream>
 #include <iostream>
-
+#include <cstdlib>
 
 void nnlab::plot(const std::string& path)
 {
     std::string command =
-        "python3.12 code/plot.py " + path;
+        "python3 scripts/plot.py " + path;
 
     int result = system(command.c_str());
 
     if (result != 0)
     {
-        std::cerr << "Python visualization failed\n";
+        throw std::runtime_error("Python visualization failed");
     }
+
 }

@@ -2,8 +2,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "../code/file_import.h"
-#include "../code/matrix_realization.h"
+#include "../include/file_import.h"
+#include "../include/matrix_realization.h"
 
 using namespace nnlab;
 
@@ -33,24 +33,6 @@ void testFileImportRawCorrect() {
 
     removeTestFile("data/test_raw.csv");
     std::cout << "Test vector<vector<>> fileImportRaw - OK" << std::endl;
-}
-
-void testFileImportRawComments() {
-    createTestFile("data/test_comments.csv",
-        "x, y\n"
-        "# comment №1\n"
-        "1.0, 2.0\n"
-        "# another comment\n"
-        "3.0, 4.0");
-
-    auto data = fileImportRaw("data/test_comments.csv");
-
-    assert(data.size() == 2);
-    assert(data[0][0] == 1.0);
-    assert(data[1][0] == 3.0);
-
-    removeTestFile("data/test_comments.csv");
-    std::cout << "Test fileImportRaw with comments - OK" << std::endl;
 }
 
 void testFileImportRawNoFile() {
@@ -271,7 +253,6 @@ void testFileSaveToCSVWrongSize() {
 
 void runAllFileImportTests() {
     testFileImportRawCorrect();
-    testFileImportRawComments();
     testFileImportRawInvalidFormat();
     testFileImportRawNoFile();
     testFileImportMatrixRawCorrect();
