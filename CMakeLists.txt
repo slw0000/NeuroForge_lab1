@@ -4,15 +4,15 @@ project(NeuralNetworkLab1 VERSION 1.0)
 
 set(CMAKE_CXX_STANDARD 20)
 
-add_executable(main code/main.cpp
-        code/file_import.cpp
-        code/file_import.h
-        code/matrix_realization.cpp
-        code/matrix_realization.h
-        code/visualization.cpp
-        code/visualization.h
-        code/utils.cpp
-        code/utils.h
+include_directories(
+        ${CMAKE_SOURCE_DIR}/include
+)
+
+add_executable(main src/main.cpp
+        src/file_import.cpp
+        src/matrix_realization.cpp
+        src/visualization.cpp
+        src/utils.cpp
         tests/matrix_tests.cpp
         tests/file_Import_tests.cpp
         tests/visualization_tests.cpp
@@ -21,5 +21,5 @@ add_executable(main code/main.cpp
 file(COPY ${CMAKE_SOURCE_DIR}/data
         DESTINATION ${CMAKE_BINARY_DIR})
 
-file(COPY ${CMAKE_SOURCE_DIR}/code/plot.py
-        DESTINATION ${CMAKE_BINARY_DIR}/code)
+file(COPY ${CMAKE_SOURCE_DIR}/scripts/
+        DESTINATION ${CMAKE_BINARY_DIR}/scripts)

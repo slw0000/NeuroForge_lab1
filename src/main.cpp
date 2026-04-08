@@ -2,11 +2,10 @@
 
 #include <vector>
 
-#include "visualization.h"
-#include "matrix_realization.h"
-#include "file_import.h"
-#include "visualization.h"
-#include "utils.h"
+#include "../include/visualization.h"
+#include "../include/matrix_realization.h"
+#include "../include/file_import.h"
+#include "../include/utils.h"
 
 void runAllMatrixTests();
 void runAllFileImportTests();

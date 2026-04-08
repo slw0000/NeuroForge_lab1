@@ -2,8 +2,8 @@
 #include <iostream>
 #include <fstream>
 
-#include "../code/file_import.h"
-#include "../code/matrix_realization.h"
+#include "../include/file_import.h"
+#include "../include/matrix_realization.h"
 
 using namespace nnlab;
 
