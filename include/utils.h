@@ -17,5 +17,14 @@ namespace nnlab {
 
     double relu(double x);
     double reluDerivative(double x);
+
+    double tanh(double x);
+    double tanhDerivative(double x);
+
+    double mseLoss(double predictValue, int correctValue);
+    double mseDerivative(double predictValue, int correctValue);
+
+    double bceLoss(double predictValue, int correctValue);
+    double bceDerivative(double predictValue, int correctValue);
 }
 

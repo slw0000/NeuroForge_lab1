@@ -2,11 +2,9 @@
 
 #include <vector>
 
+#include "file_import.h"
 #include "../include/neural_network.h"
 #include "../include/visualization.h"
-#include "../include/matrix_realization.h"
-#include "../include/file_import.h"
-#include "../include/utils.h"
 
 void runAllMatrixTests();
 void runAllFileImportTests();
@@ -69,14 +67,28 @@ int main(int argc, char* argv[]) {
     }
     else{
 
-        NeuralNetwork net1 = NeuralNetwork();
+        NeuralNetwork net1 = NeuralNetwork(0.1);
 
         auto weights = net1.getWeights();
         for (Matrix& i: weights) { std::cout << "Layer: \n" << i << std::endl; }
 
-        std::cout << "Learning rate: " << net1.getLearningRate() << std::endl;
-        net1.setLearningRate(0.5);
-        std::cout << "Learning rate: " << net1.getLearningRate() << std::endl;
+        auto trainData = nnlab::genBinClassifyDataset(500, 0.3);
+        auto testData = nnlab::genBinClassifyDataset(200, 0.1, 0.2, 0.7, 0.9, 0.3);
+        nnlab::fileSaveToCSV("data/testData.csv", testData.first, testData.second);
+        nnlab::plot("data/testData.csv");
+
+        net1.train(trainData, nnlab::mseLoss, nnlab::mseDerivative, 1000);
+
+        auto test = net1.predict(testData.first);
+        auto testProba = net1.predictProba(testData.first);
+
+        std::cout << "\nProbability test:" << std::endl;
+        for (int i = 0; i <= test.size(); i = i + 20) { std::cout << test[i] << " " << testProba[i] << std::endl; }
+
+        double sum = 0;
+        for (int i = 0; i < test.size(); i++) {if (test[i] == testData.second[i]) {sum += 1;} }
+        std::cout << "\nAccuracy: " << sum / static_cast<double>(test.size()) << std::endl;
+
 
         return 0;
     }

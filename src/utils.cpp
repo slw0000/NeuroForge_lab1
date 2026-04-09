@@ -62,3 +62,29 @@ double nnlab::reluDerivative(double x) {
     if (x > 0.0) { return 1.0; }
     return 0.0;
 }
+
+double nnlab::tanh(double x) {
+    return std::tanh(x);
+}
+
+double nnlab::tanhDerivative(double tanhOutput) {
+    return 1.0 - tanhOutput * tanhOutput;
+}
+
+double nnlab::mseLoss(double predictValue, int correctValue) {
+    double diff = predictValue - correctValue;
+    return 0.5 * (diff * diff);
+}
+
+double nnlab::mseDerivative(double predictValue, int correctValue) {
+    return predictValue - correctValue;
+}
+
+double nnlab::bceLoss(double predictValue, int correctValue) {
+    return - (correctValue * std::log(predictValue) + (1 - correctValue) * std::log(1 - predictValue));
+}
+
+double nnlab::bceDerivative(double predictValue, int correctValue) {
+    return (predictValue - correctValue) / (predictValue * (1 - predictValue));
+}
+
