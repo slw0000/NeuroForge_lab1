@@ -46,5 +46,19 @@ std::pair<std::vector<nnlab::Matrix>, std::vector<int>> nnlab::genBinClassifyDat
     return std::make_pair(cords, label);
 }
 
+double nnlab::sigmoid(double x) {
+    return 1.0 / (1.0 + std::exp(-x));
+}
 
+double nnlab::sigmoidDerivative(double sigmoidOutput) {
+    return sigmoidOutput * (1.0 - sigmoidOutput);
+}
 
+double nnlab::relu(double x) {
+    return std::max(0.0, x);
+}
+
+double nnlab::reluDerivative(double x) {
+    if (x > 0.0) { return 1.0; }
+    return 0.0;
+}

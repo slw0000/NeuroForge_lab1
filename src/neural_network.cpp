@@ -27,4 +27,15 @@ std::vector<nnlab::Matrix> NeuralNetwork::getWeights() {
     return weights;
 }
 
+void NeuralNetwork::setLearningRate(double learning_rate) {
+    if (learning_rate <= 0.0) {
+        throw std::invalid_argument("learningRate должен быть больше 0!");
+    }
+    learningRate = learning_rate;
+}
+
+double NeuralNetwork::getLearningRate() {
+    return learningRate;
+}
+
 
