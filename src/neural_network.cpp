@@ -16,14 +16,14 @@ NeuralNetwork::NeuralNetwork(double learning_rate):
     }
 }
 
-void NeuralNetwork::setWeights(std::vector<nnlab::Matrix> weights) {
+void NeuralNetwork::setWeights(std::vector<nnlab::Matrix>& weights) {
     weightsHidden1 = weights[0];
     weightsHidden2 = weights[1];
     weightsOutput = weights[2];
 }
 
 std::vector<nnlab::Matrix> NeuralNetwork::getWeights(){
-    std::vector weights = {weightsHidden1, weightsHidden2, weightsOutput};
+    std::vector<nnlab::Matrix> weights = {weightsHidden1, weightsHidden2, weightsOutput};
     return weights;
 }
 
@@ -38,7 +38,7 @@ double NeuralNetwork::getLearningRate(){
     return learningRate;
 }
 
-double NeuralNetwork::forward(const nnlab::Matrix& vector) {
+NeuralNetwork::LearningInfo NeuralNetwork::forward(const nnlab::Matrix& vector) {
 
     nnlab::Matrix layer1 = weightsHidden1 * vector;
     layer1(0, 0) = nnlab::sigmoid(layer1(0, 0));
@@ -49,15 +49,16 @@ double NeuralNetwork::forward(const nnlab::Matrix& vector) {
     layer2(1, 0) = nnlab::sigmoid(layer2(1, 0));
 
     double output = nnlab::sigmoid((weightsOutput * layer2)(0, 0));
+    LearningInfo info = {layer1, layer2, output};
 
-    return output;
+    return info;
 }
 
 std::vector<double> NeuralNetwork::predictProba(std::vector<nnlab::Matrix>& inputData) {
     std::vector<double> prediction(inputData.size());
 
     for (size_t i = 0; i < inputData.size(); i++) {
-        prediction[i] = forward(inputData[i]);
+        prediction[i] = forward(inputData[i]).output;
     }
 
     return prediction;
@@ -78,7 +79,7 @@ std::vector<int> NeuralNetwork::predict(std::vector<nnlab::Matrix>& inputData) {
 void NeuralNetwork::train(std::pair<std::vector<nnlab::Matrix>, std::vector<int>>& trainData,
     const LossFunction& lossFunc, const LossFunction& lossDerivative, int maxEpochs, double minDelta, int patience) {
 
-    // используем sigmoid на выходном слое и tanh на остальных, по умолчанию BinCrossEnt как Loss по умлочанию
+    // используем sigmoid на всех слоях, MSE как Loss по умлочанию
 
     auto trainValues = trainData.first;
     auto trainPoints = trainData.second;
@@ -94,14 +95,9 @@ void NeuralNetwork::train(std::pair<std::vector<nnlab::Matrix>, std::vector<int>
 
             // считаем output(x)
             auto vector = trainValues[i];
-            nnlab::Matrix layer1 = weightsHidden1 * vector;
-            layer1(0, 0) = nnlab::sigmoid(layer1(0, 0));
-            layer1(1, 0) = nnlab::sigmoid(layer1(1, 0));
-            nnlab::Matrix layer2 = weightsHidden2 * layer1;
-            layer2(0, 0) = nnlab::sigmoid(layer2(0, 0));
-            layer2(1, 0) = nnlab::sigmoid(layer2(1, 0));
-
-            double output = nnlab::sigmoid((weightsOutput * layer2)(0, 0));
+            LearningInfo info = forward(vector);
+            auto layer1 = info.layer1, layer2 = info.layer2;
+            auto output = info.output;
 
             // считаем delta(x)
             auto deltaOut = - lossDerivative(output, trainPoints[i]) * nnlab::sigmoidDerivative(output);
@@ -142,10 +138,12 @@ void NeuralNetwork::train(std::pair<std::vector<nnlab::Matrix>, std::vector<int>
             epochLoss += lossFunc(output, trainPoints[i]);
         }
 
+        // Если разница в Loss между прошлой и нынешней эпохой меньше Epsilon, увеличиваем счётчик
         if (std::abs((prevLoss - epochLoss) / trainPoints.size()) < minDelta) {
             curPatience += 1;
         } else { curPatience = 0; }
 
+        // Если счётчик превысил заданное значение, значит обучение закончено
         if (curPatience >= patience) {
             double Loss = epochLoss / trainPoints.size() ;
             std::cout << "Epoch " << epo << ": Loss = " << Loss << std::endl;
