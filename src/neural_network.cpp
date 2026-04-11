@@ -1,56 +1,70 @@
 #include "neural_network.h"
 
-NeuralNetwork::NeuralNetwork(double learning_rate):
-    weightsHidden1(2, 2), weightsHidden2(2, 2),
-    weightsOutput(1, 2), learningRate(learning_rate) {
+NeuralNetwork::NeuralNetwork(const std::vector<int>& neuralNetStruct,
+    const std::vector<ActivationFunc>& activationFuncList,
+    const std::vector<ActivationFunc>& activationFuncDerivativeList):
 
-    for (size_t i = 0; i < 2; i++) {
-        for (size_t j = 0; j < 2; j++) {
-            weightsHidden1(i, j) = nnlab::genRandomNumber(-1.0, 1.0);
-            weightsHidden2(i, j) = nnlab::genRandomNumber(-1.0, 1.0);
-        }
+    neuralNetStruct(neuralNetStruct) {
+
+    if (neuralNetStruct.size() < 2) {
+        throw std::invalid_argument("Структура перцептрона должна содержать минимум 2 слоя!");
     }
 
-    for (size_t i = 0; i < 2; i++) {
-        weightsOutput(0, i) = nnlab::genRandomNumber(-1.0, 1.0);
+    if (activationFuncList.size() != activationFuncDerivativeList.size()) {
+        throw std::invalid_argument("Количество функций активации должно совпадать с количеством их производных!");
+    }
+
+    if (!activationFuncList.empty() && neuralNetStruct.size() != activationFuncList.size() - 1) {
+        throw std::invalid_argument("Количество функций активации должно совпадать с количеством слоёв!");
+    }
+
+    for (size_t i = 0; i < neuralNetStruct.size() - 1; i++) {
+        if (activationFuncList.empty()) {
+            weights.push_back(Layer(neuralNetStruct[i], neuralNetStruct[i + 1]));
+        } else {
+            weights.push_back(Layer(neuralNetStruct[i], neuralNetStruct[i + 1],
+                activationFuncList[i], activationFuncDerivativeList[i]));
+        }
     }
 }
 
-void NeuralNetwork::setWeights(std::vector<nnlab::Matrix>& weights) {
-    weightsHidden1 = weights[0];
-    weightsHidden2 = weights[1];
-    weightsOutput = weights[2];
+void NeuralNetwork::setWeights(std::vector<nnlab::Matrix>& weightsList) {
+    if (weights.size() != weightsList.size()) {
+        throw std::invalid_argument("Количество матриц весов не совпадает с количеством слоёв!");
+    }
+
+    for (size_t i = 0; i < weightsList.size(); i++) {
+        if (weightsList[i].cols() != weights[i].weights.cols() ||
+            weightsList[i].rows() != weights[i].weights.rows()) {
+            throw std::invalid_argument("Размеры матриц весов не совпадают со структурой нейронной сети!");
+        }
+
+        weights[i].weights = weightsList[i];
+    }
 }
 
 std::vector<nnlab::Matrix> NeuralNetwork::getWeights(){
-    std::vector<nnlab::Matrix> weights = {weightsHidden1, weightsHidden2, weightsOutput};
-    return weights;
-}
+    std::vector<nnlab::Matrix> weightsList;
 
-void NeuralNetwork::setLearningRate(double learning_rate) {
-    if (learning_rate <= 0.0) {
-        throw std::invalid_argument("learningRate должен быть больше 0!");
+    for (auto& i : weights) {
+        weightsList.push_back(i.weights);
     }
-    learningRate = learning_rate;
+    return weightsList;
 }
 
-double NeuralNetwork::getLearningRate(){
-    return learningRate;
-}
+std::vector<nnlab::Matrix> NeuralNetwork::forward(nnlab::Matrix vector) {
+    std::vector<nnlab::Matrix> info;
+    info.push_back(vector);
 
-NeuralNetwork::LearningInfo NeuralNetwork::forward(const nnlab::Matrix& vector) {
-
-    nnlab::Matrix layer1 = weightsHidden1 * vector;
-    layer1(0, 0) = nnlab::sigmoid(layer1(0, 0));
-    layer1(1, 0) = nnlab::sigmoid(layer1(1, 0));
-
-    nnlab::Matrix layer2 = weightsHidden2 * layer1;
-    layer2(0, 0) = nnlab::sigmoid(layer2(0, 0));
-    layer2(1, 0) = nnlab::sigmoid(layer2(1, 0));
-
-    double output = nnlab::sigmoid((weightsOutput * layer2)(0, 0));
-    LearningInfo info = {layer1, layer2, output};
-
+    for (int l = 0; l < weights.size(); l++) {
+        vector = weights[l].weights * vector;
+        for (size_t i = 0; i < vector.rows(); i++) {
+            for (size_t j = 0; j < vector.cols(); j++) {
+                vector(i, j) = weights[l].activationFunc(vector(i, j));
+            }
+        }
+        info.push_back(vector);
+    }
     return info;
 }
 
@@ -58,7 +72,7 @@ std::vector<double> NeuralNetwork::predictProba(std::vector<nnlab::Matrix>& inpu
     std::vector<double> prediction(inputData.size());
 
     for (size_t i = 0; i < inputData.size(); i++) {
-        prediction[i] = forward(inputData[i]).output;
+        prediction[i] = forward(inputData[i]).back()(0, 0);
     }
 
     return prediction;
@@ -77,65 +91,71 @@ std::vector<int> NeuralNetwork::predict(std::vector<nnlab::Matrix>& inputData) {
 }
 
 void NeuralNetwork::train(std::pair<std::vector<nnlab::Matrix>, std::vector<int>>& trainData,
-    const LossFunction& lossFunc, const LossFunction& lossDerivative, int maxEpochs, double minDelta, int patience) {
+    const LossFunction& lossFunc, const LossFunction& lossDerivative, int maxEpochs, double learningRate, double minDelta, int patience) {
 
     // используем sigmoid на всех слоях, MSE как Loss по умлочанию
-
     auto trainValues = trainData.first;
     auto trainPoints = trainData.second;
-
     double prevLoss = 0.0;
     double epochLoss = 0.0;
     int curPatience = 0;
 
+    // проходимся по эпохам
     for (int epo = 0; epo <= maxEpochs; epo++) {
         epochLoss = 0.0;
 
+        // проходимся по точкам из обучающей выборки
         for (size_t i = 0; i < trainPoints.size(); i++) {
 
             // считаем output(x)
             auto vector = trainValues[i];
-            LearningInfo info = forward(vector);
-            auto layer1 = info.layer1, layer2 = info.layer2;
-            auto output = info.output;
+            std::vector<nnlab::Matrix> info = forward(vector);
 
             // считаем delta(x)
-            auto deltaOut = - lossDerivative(output, trainPoints[i]) * nnlab::sigmoidDerivative(output);
+            std::vector<nnlab::Matrix> delta;
 
-            auto delta2 = nnlab::Matrix(2, 1);
-            delta2(0, 0) = nnlab::sigmoidDerivative(layer2(0, 0)) * deltaOut * weightsOutput(0, 0);
-            delta2(1, 0) = nnlab::sigmoidDerivative(layer2(1, 0)) * deltaOut * weightsOutput(0, 1);
+            // выходной слой
+            nnlab::Matrix lastLayer = nnlab::Matrix(weights.back().outputSize, 1);
+            for (size_t j = 0; j < weights.back().outputSize; j++) {
+                lastLayer(j, 0) = - lossDerivative(info.back()(j, 0), trainPoints[i]) *
+                    weights.back().activationFuncDerivative(info.back()(j, 0));
+            }
+            delta.push_back(lastLayer);
 
-            auto delta1 = nnlab::Matrix(2, 1);
-            delta1(0, 0) = nnlab::sigmoidDerivative(layer1(0, 0)) * (delta2(0, 0) * weightsHidden2(0, 0) +
-                                                                            delta2(1, 0) * weightsHidden2(1, 0));
-            delta1(1, 0) = nnlab::sigmoidDerivative(layer1(1, 0)) * (delta2(0, 0) * weightsHidden2(0, 1) +
-                                                                            delta2(1, 0) * weightsHidden2(1, 1));
+            // скрытые слои
+            for (int l = weights.size() - 2; l >= 0; l--) {
+                auto tempDelta = nnlab::Matrix(weights[l].outputSize, 1);
+                for (size_t j = 0; j < weights[l].outputSize; j++) {
+                    double sum = 0.0;
+                    for (size_t k = 0; k < weights[l + 1].outputSize; k++) {
+                        sum += delta.back()(k, 0) * weights[l + 1].weights(k, j);
+                    }
+                    tempDelta(j, 0) = weights[l].activationFuncDerivative(info[l + 1](j, 0)) * sum;
+                }
+                delta.push_back(tempDelta);
+            }
+            std::reverse(delta.begin(), delta.end());
 
             // считаем p(w)
-            auto p_hidden1 = nnlab::Matrix(2, 2);
-            auto p_hidden2 = nnlab::Matrix(2, 2);
-            auto p_output = nnlab::Matrix(1, 2);
+            std::vector<nnlab::Matrix> pVectors;
 
-            p_hidden1(0, 0) = delta1(0, 0) * vector(0, 0);
-            p_hidden1(0, 1) = delta1(0, 0) * vector(1, 0);
-            p_hidden1(1, 0) = delta1(1, 0) * vector(0, 0);
-            p_hidden1(1, 1) = delta1(1, 0) * vector(1, 0);
-
-            p_hidden2(0, 0) = delta2(0, 0) * layer1(0, 0);
-            p_hidden2(0, 1) = delta2(0, 0) * layer1(1, 0);
-            p_hidden2(1, 0) = delta2(1, 0) * layer1(0, 0);
-            p_hidden2(1, 1) = delta2(1, 0) * layer1(1, 0);
-
-            p_output(0, 0) = deltaOut * layer2(0, 0);
-            p_output(0, 1) = deltaOut * layer2(1, 0);
+            for (size_t j = 0; j < delta.size(); j++) {
+                auto pTemp = nnlab::Matrix(weights[j].outputSize, weights[j].inputSize);
+                for (size_t rows = 0; rows < pTemp.rows(); rows++) {
+                    for (size_t cols = 0; cols < pTemp.cols(); cols++) {
+                        pTemp(rows, cols) = delta[j](rows, 0) * info[j](cols, 0);
+                    }
+                }
+                pVectors.push_back(pTemp);
+            }
 
             // считаем обновленные веса
-            weightsHidden1 = weightsHidden1 + p_hidden1 * learningRate;
-            weightsHidden2 = weightsHidden2 + p_hidden2 * learningRate;
-            weightsOutput = weightsOutput + p_output * learningRate;
 
-            epochLoss += lossFunc(output, trainPoints[i]);
+            for (size_t j = 0; j < weights.size(); j++) {
+                weights[j].weights = weights[j].weights + pVectors[j] * learningRate;
+            }
+
+            epochLoss += lossFunc(info.back()(0, 0), trainPoints[i]);
         }
 
         // Если разница в Loss между прошлой и нынешней эпохой меньше Epsilon, увеличиваем счётчик

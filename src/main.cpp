@@ -65,7 +65,7 @@ int main(int argc, char* argv[]) {
     }
     else{
 
-        NeuralNetwork net1 = NeuralNetwork(0.1);
+        NeuralNetwork net1 = NeuralNetwork(), net2 = NeuralNetwork();
 
         auto trainData = minMaxNormalization(genBinClassifyDataset(1000, 0.4));
         auto testData  = minMaxNormalization(genBinClassifyDataset(200, 0.6));
@@ -73,20 +73,29 @@ int main(int argc, char* argv[]) {
         fileSaveToCSV("data/testData.csv", testData.first, testData.second);
         plot("data/testData.csv");
 
-        net1.train(trainData, bceLoss, bceDerivative);
-        // net1.train(trainData);
 
-        auto weights = net1.getWeights();
-        for (Matrix& i: weights) { std::cout << "\nLayer: \n" << i << std::endl; }
+        net1.train(trainData);
+        net2.train(trainData, bceLoss, bceDerivative);
 
-        auto test = net1.predict(testData.first);
-        auto testProba = net1.predictProba(testData.first);
+        // auto weights = net1.getWeights();
+        // for (Matrix& i: weights) { std::cout << "\nLayer: \n" << i << std::endl; }
 
-        std::cout << "\nProbability test:" << std::endl;
-        for (int i = 0; i < test.size(); i = i + 20) { std::cout << test[i] << " " << testProba[i] << std::endl; }
+        auto test1 = net1.predict(testData.first);
+        auto test2 = net2.predict(testData.first);
+        auto testProba1 = net1.predictProba(testData.first);
+        auto testProba2 = net2.predictProba(testData.first);
 
-        std::cout << "\nAccuracy: " << accuracy(test, testData.second) << std::endl;
-        std::cout << "\nRoc-Auc: " << rocAuc(testProba, testData.second) << std::endl;
+        std::cout << "\nProbability test for net1:" << std::endl;
+        for (int i = 0; i < test1.size(); i = i + 20) { std::cout << test1[i] << " " << testProba1[i] << std::endl; }
+
+        std::cout << "\nProbability test for net2:" << std::endl;
+        for (int i = 0; i < test2.size(); i = i + 20) { std::cout << test2[i] << " " << testProba2[i] << std::endl; }
+
+
+        std::cout << "\nAccuracy: \nnet1: " << accuracy(test1, testData.second) <<
+            "\nnet2: " << accuracy(test2, testData.second) << std::endl;
+        std::cout << "\nRoc-Auc: \nnet1: " << rocAuc(testProba1, testData.second) <<
+            "\nnet2: " << rocAuc(testProba2, testData.second) << std::endl;
 
 
         return 0;

@@ -14,6 +14,7 @@ add_executable(main src/main.cpp
         src/visualization.cpp
         src/utils.cpp
         src/neural_network.cpp
+        src/layer.cpp
         tests/matrix_tests.cpp
         tests/file_Import_tests.cpp
         tests/visualization_tests.cpp
