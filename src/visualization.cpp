@@ -7,7 +7,7 @@
 void nnlab::plot(const std::string& path)
 {
     std::string command =
-        "python3 scripts/plot.py " + path;
+        "python scripts/plot.py " + path;
 
     int result = system(command.c_str());
 
