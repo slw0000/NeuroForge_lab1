@@ -90,7 +90,7 @@ std::vector<int> NeuralNetwork::predict(std::vector<nnlab::Matrix>& inputData) {
     return prediction;
 }
 
-void NeuralNetwork::train(std::pair<std::vector<nnlab::Matrix>, std::vector<int>>& trainData,
+void NeuralNetwork::train(Dataset& trainData,
     const LossFunction& lossFunc, const LossFunction& lossDerivative, int maxEpochs, double learningRate, double minDelta, int patience) {
 
     // используем sigmoid на всех слоях, MSE как Loss по умлочанию

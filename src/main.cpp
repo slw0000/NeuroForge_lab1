@@ -2,7 +2,7 @@
 
 #include <vector>
 
-#include "file_import.h"
+#include "../include/file_import.h"
 #include "../include/neural_network.h"
 #include "../include/visualization.h"
 

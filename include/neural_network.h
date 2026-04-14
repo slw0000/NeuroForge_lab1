@@ -1,5 +1,7 @@
 #pragma once
 
+#include <functional>
+
 #include "matrix_realization.h"
 #include "utils.h"
 #include "layer.h"
@@ -17,7 +19,7 @@ public:
         const std::vector<ActivationFunc>& activationFuncList = {},
         const std::vector<ActivationFunc>& activationFuncDerivativeList = {});
 
-    void train(std::pair<std::vector<nnlab::Matrix>, std::vector<int>>& trainData,
+    void train(Dataset& trainData,
         const LossFunction& lossFunc = nnlab::mseLoss,
         const LossFunction& lossDerivative = nnlab::mseDerivative,
         int maxEpochs = 10000, double learningRate = 0.1, double minDelta = 0.00001,

@@ -103,7 +103,7 @@ std::vector<nnlab::Matrix> nnlab::fileImportMatrixRaw(const std::string& fileNam
     return data;
 }
 
-std::pair<std::vector<nnlab::Matrix>, std::vector<int>> nnlab::fileImportMatrixLabel(const std::string& fileName) {
+Dataset nnlab::fileImportMatrixLabel(const std::string& fileName) {
     /*
     Записывает данные файла (в формате .csv, т.е. построчно через запятую)
     в пару <массив Матриц (Matrix), массив меток классов (int)>. Обрабатывает файлы c метками классов.

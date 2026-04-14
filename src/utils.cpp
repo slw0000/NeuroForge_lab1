@@ -1,6 +1,7 @@
 #include "../include/utils.h"
 
 #include <random>
+#include <algorithm>
 
 
 double nnlab::genRandomNumber(double min, double max) {
@@ -17,7 +18,7 @@ int nnlab::genRandomInt(int min, int max) {
     return dist(generate);
 }
 
-std::pair<std::vector<nnlab::Matrix>, std::vector<int>> nnlab::genBinClassifyDataset(int count, double noise,
+Dataset nnlab::genBinClassifyDataset(int count, double noise,
     double x0_center, double y0_center, double x1_center, double y1_center) {
     if (count <= 0) {
         throw std::invalid_argument("Ошибка генерации датасета: количество элементов должно быть > 0!");
@@ -45,7 +46,7 @@ std::pair<std::vector<nnlab::Matrix>, std::vector<int>> nnlab::genBinClassifyDat
     return std::make_pair(cords, label);
 }
 
-std::pair<std::vector<nnlab::Matrix>, std::vector<int> > nnlab::minMaxNormalization(
+Dataset nnlab::minMaxNormalization(
     const std::pair<std::vector<Matrix>, std::vector<int> > &data) {
 
     if (data.first.empty()) { throw std::invalid_argument("Массив координат не может быть пустым!"); }
