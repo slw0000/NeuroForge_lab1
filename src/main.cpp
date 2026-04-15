@@ -6,11 +6,14 @@
 #include "../include/neural_network.h"
 #include "../include/visualization.h"
 
+
 void runAllMatrixTests();
 void runAllFileImportTests();
 void runVisualizationTests();
 
 using namespace nnlab;
+
+
 
 int main(int argc, char* argv[]) {
 
@@ -20,15 +23,22 @@ int main(int argc, char* argv[]) {
     /*
      Для запуска демонстрации работы класса матриц и утилиты работы с файлами, надо просто запустить программу.
      Для запуска тестирования необходимо запустить программу с конфигурацией "--test".
+     Для запуска показа примера модели необходимо запустить программу с конфигурацией "--example".
     */
 
     bool runTests = false;
+    bool exampleShow = false;
     for (int i = 1; i < argc; i++) {
         if (std::string(argv[i]) == "--test") {
             runTests = true;
             break;
         }
+        else if (std::string(argv[i]) == "--example") {
+            exampleShow = true;
+            break;
+        }
     }
+
 
     if (runTests) {
         std::cout << "Matrix tests: \n" << std::endl;
@@ -61,6 +71,84 @@ int main(int argc, char* argv[]) {
         } catch (...) {
             std::cerr << "Unknown error" << std::endl;
             return 1;
+        }
+    }
+    else if (exampleShow) {
+        auto [trainCoords, trainLabels] = genBinClassifyDataset(1000, 0.8,
+        0.4, 0.4,
+        0.6, 0.6
+        );
+        auto [testCoords, testLabels]   = genBinClassifyDataset(200, 0.8);
+
+        auto trainData = minMaxNormalization({trainCoords, trainLabels});
+        auto testData  = minMaxNormalization({testCoords, testLabels});
+
+        fileSaveToCSV("data/example_test.csv", testData.first, testData.second);
+
+        NeuralNetwork net_default({2, 4, 4, 1});
+
+        NeuralNetwork net_simple(
+            {2, 4, 1},
+            {tanh, sigmoid},
+            {tanhDerivative, sigmoidDerivative}
+        );
+
+
+        net_default.train(trainData);
+
+        net_simple.train(
+            trainData,
+            mseLoss, mseDerivative,
+            0.0001,
+            5000,
+            1e-4,
+            15
+        );
+        // === DEBUG: проверка весов ===
+        auto weights = net_simple.getWeights();
+        std::cout << "\n[DEBUG] Weight statistics:" << std::endl;
+        for (size_t l = 0; l < weights.size(); ++l) {
+            double maxW = 0, sumW = 0;
+            for (size_t i = 0; i < weights[l].rows(); ++i)
+                for (size_t j = 0; j < weights[l].cols(); ++j) {
+                    double w = std::abs(weights[l](i, j));
+                    maxW = std::max(maxW, w);
+                    sumW += w;
+                }
+            double avgW = sumW / (weights[l].rows() * weights[l].cols());
+            std::cout << "  Layer " << l << ": max|w|=" << maxW
+                      << ", avg|w|=" << avgW << std::endl;
+        }
+
+        auto predictions_default = net_default.predict(testData.first);
+        auto predictions_simple  = net_simple.predict(testData.first);
+
+        auto probabilities_default = net_default.predictProba(testData.first);
+        auto probabilities_simple  = net_simple.predictProba(testData.first);
+
+        double acc_default = accuracy(predictions_default, testData.second);
+        double acc_simple  = accuracy(predictions_simple, testData.second);
+
+        double auc_default = rocAuc(probabilities_default, testData.second);
+        double auc_simple  = rocAuc(probabilities_simple, testData.second);
+
+        std::cout << "\n RESULTS" << std::endl;
+
+        std::cout << "\n Default model (2-4-4-1, MSE):" << std::endl;
+        std::cout << "   Accuracy: " << acc_default << std::endl;
+        std::cout << "   ROC-AUC:  " << auc_default << std::endl;
+
+        std::cout << "\n Custom simple model (2-4-1, BCE, tanh):" << std::endl;
+        std::cout << "   Accuracy: " << acc_simple << std::endl;
+        std::cout << "   ROC-AUC:  " << auc_simple << std::endl;
+
+        std::cout << "Example of predictions (10 first points):" << std::endl;
+        std::cout << "№\tPrediction\tProbability\tTrue class" << std::endl;
+        for (int i = 0; i < 10; ++i) {
+            std::cout << i << "\t"
+                      << predictions_simple[i] << "\t\t"
+                      << probabilities_simple[i] << "\t\t"
+                      << testData.second[i] << std::endl;
         }
     }
     else{
@@ -96,7 +184,6 @@ int main(int argc, char* argv[]) {
             "\nnet2: " << accuracy(test2, testData.second) << std::endl;
         std::cout << "\nRoc-Auc: \nnet1: " << rocAuc(testProba1, testData.second) <<
             "\nnet2: " << rocAuc(testProba2, testData.second) << std::endl;
-
 
         return 0;
     }

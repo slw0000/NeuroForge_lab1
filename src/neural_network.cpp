@@ -155,6 +155,18 @@ void NeuralNetwork::train(Dataset& trainData,
                 weights[j].weights = weights[j].weights + pVectors[j] * learningRate;
             }
 
+            {
+                const double MAX_WEIGHT = 2.0;
+                for (size_t j = 0; j < weights.size(); j++) {
+                    for (size_t r = 0; r < weights[j].weights.rows(); ++r) {
+                        for (size_t c = 0; c < weights[j].weights.cols(); ++c) {
+                            double& w = weights[j].weights(r, c);
+                            w = std::max(-MAX_WEIGHT, std::min(MAX_WEIGHT, w));
+                        }
+                    }
+                }
+            }
+
             epochLoss += lossFunc(info.back()(0, 0), trainPoints[i]);
         }
 
