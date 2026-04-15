@@ -85,27 +85,23 @@ int main(int argc, char* argv[]) {
 
         fileSaveToCSV("data/example_test.csv", testData.first, testData.second);
 
-        NeuralNetwork net_default({2, 4, 4, 1});
-
-        NeuralNetwork net_simple(
-            {2, 4, 1},
-            {relu, sigmoid},
-            {reluDerivative, sigmoidDerivative}
-        );
+        NeuralNetwork default_model = NeuralNetwork();
+        NeuralNetwork custom_model = NeuralNetwork({2, 4, 8, 4, 1},
+            {relu, relu, relu, sigmoid},
+            {reluDerivative, reluDerivative, reluDerivative, sigmoidDerivative});
 
 
-        net_default.train(trainData);
-
-        net_simple.train(
-            trainData,
+        default_model.train(trainData);
+        custom_model.train(trainData,
             bceLoss, bceDerivative,
             0.01,
             5000,
             1e-4,
             15
         );
+
         // === DEBUG: проверка весов ===
-        auto weights = net_simple.getWeights();
+        auto weights = custom_model.getWeights();
         std::cout << "\n[DEBUG] Weight statistics:" << std::endl;
         for (size_t l = 0; l < weights.size(); ++l) {
             double maxW = 0, sumW = 0;
@@ -120,17 +116,17 @@ int main(int argc, char* argv[]) {
                       << ", avg|w|=" << avgW << std::endl;
         }
 
-        auto predictions_default = net_default.predict(testData.first);
-        auto predictions_simple  = net_simple.predict(testData.first);
+        auto predictions_default = default_model.predict(testData.first);
+        auto predictions_custom  = custom_model.predict(testData.first);
 
-        auto probabilities_default = net_default.predictProba(testData.first);
-        auto probabilities_simple  = net_simple.predictProba(testData.first);
+        auto probabilities_default = default_model.predictProba(testData.first);
+        auto probabilities_custom  = custom_model.predictProba(testData.first);
 
         double acc_default = accuracy(predictions_default, testData.second);
-        double acc_simple  = accuracy(predictions_simple, testData.second);
+        double acc_simple  = accuracy(predictions_custom, testData.second);
 
         double auc_default = rocAuc(probabilities_default, testData.second);
-        double auc_simple  = rocAuc(probabilities_simple, testData.second);
+        double auc_simple  = rocAuc(probabilities_custom, testData.second);
 
         std::cout << "\n RESULTS" << std::endl;
 
@@ -138,7 +134,7 @@ int main(int argc, char* argv[]) {
         std::cout << "   Accuracy: " << acc_default << std::endl;
         std::cout << "   ROC-AUC:  " << auc_default << std::endl;
 
-        std::cout << "\n Custom simple model (2-4-1, BCE, relu):" << std::endl;
+        std::cout << "\n Custom model (2-4-8-4-1, BCE, relu):" << std::endl;
         std::cout << "   Accuracy: " << acc_simple << std::endl;
         std::cout << "   ROC-AUC:  " << auc_simple << std::endl;
 
@@ -146,8 +142,8 @@ int main(int argc, char* argv[]) {
         std::cout << "№\tPrediction\tProbability\tTrue class" << std::endl;
         for (int i = 0; i < 10; ++i) {
             std::cout << i << "\t"
-                      << predictions_simple[i] << "\t\t"
-                      << probabilities_simple[i] << "\t\t"
+                      << predictions_custom[i] << "\t\t"
+                      << probabilities_custom[i] << "\t\t"
                       << testData.second[i] << std::endl;
         }
     }
