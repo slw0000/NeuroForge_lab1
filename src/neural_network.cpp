@@ -14,7 +14,7 @@ NeuralNetwork::NeuralNetwork(const std::vector<int>& neuralNetStruct,
         throw std::invalid_argument("Количество функций активации должно совпадать с количеством их производных!");
     }
 
-    if (!activationFuncList.empty() && neuralNetStruct.size() != activationFuncList.size() - 1) {
+    if (!activationFuncList.empty() && neuralNetStruct.size() - 1 != activationFuncList.size()) {
         throw std::invalid_argument("Количество функций активации должно совпадать с количеством слоёв!");
     }
 
