@@ -2,6 +2,7 @@
 
 #include "matrix_realization.h"
 #include "utils.h"
+#include <functional>
 
 using ActivationFunc = std::function<double(double)>;
 
