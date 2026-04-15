@@ -89,8 +89,8 @@ int main(int argc, char* argv[]) {
 
         NeuralNetwork net_simple(
             {2, 4, 1},
-            {tanh, sigmoid},
-            {tanhDerivative, sigmoidDerivative}
+            {relu, sigmoid},
+            {reluDerivative, sigmoidDerivative}
         );
 
 
@@ -98,8 +98,8 @@ int main(int argc, char* argv[]) {
 
         net_simple.train(
             trainData,
-            mseLoss, mseDerivative,
-            0.0001,
+            bceLoss, bceDerivative,
+            0.01,
             5000,
             1e-4,
             15
@@ -138,7 +138,7 @@ int main(int argc, char* argv[]) {
         std::cout << "   Accuracy: " << acc_default << std::endl;
         std::cout << "   ROC-AUC:  " << auc_default << std::endl;
 
-        std::cout << "\n Custom simple model (2-4-1, BCE, tanh):" << std::endl;
+        std::cout << "\n Custom simple model (2-4-1, BCE, relu):" << std::endl;
         std::cout << "   Accuracy: " << acc_simple << std::endl;
         std::cout << "   ROC-AUC:  " << auc_simple << std::endl;
 
