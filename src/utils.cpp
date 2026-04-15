@@ -91,10 +91,14 @@ double nnlab::reluDerivative(double x) {
 }
 
 double nnlab::tanh(double x) {
+    const double clip = 20.0;
+    x = std::max(-clip, std::min(clip, x));
     return std::tanh(x);
 }
 
 double nnlab::tanhDerivative(double tanhOutput) {
+    const double eps = 1e-7;
+    tanhOutput = std::max(-1.0 + eps, std::min(1.0 - eps, tanhOutput));
     return 1.0 - tanhOutput * tanhOutput;
 }
 
@@ -108,11 +112,15 @@ double nnlab::mseDerivative(double predictValue, int correctValue) {
 }
 
 double nnlab::bceLoss(double predictValue, int correctValue) {
-    return - (correctValue * std::log(predictValue) + (1 - correctValue) * std::log(1 - predictValue));
+    const double eps = 1e-7;
+    double p = std::max(eps, std::min(1.0 - eps, predictValue));
+    return - (correctValue * std::log(p) + (1 - correctValue) * std::log(1 - p));
 }
 
 double nnlab::bceDerivative(double predictValue, int correctValue) {
-    return (predictValue - correctValue) / (predictValue * (1 - predictValue));
+    const double eps = 1e-7;
+    double p = std::max(eps, std::min(1.0 - eps, predictValue));
+    return (p - correctValue) / (p * (1 - p) + eps);
 }
 
 double nnlab::accuracy(const std::vector<int>& predict, const std::vector<int>& correct) {
