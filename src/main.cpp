@@ -18,8 +18,8 @@ int main(int argc, char* argv[]) {
     // SetConsoleCP(CP_UTF8);       /* это только для VScode на Windows */
 
     /*
-     Для запуска демонстрации работы класса матриц и утилиты работы с файлами, надо просто запустить программу.
      Для запуска тестирования необходимо запустить программу с конфигурацией "--test".
+    Для запуска демонстрации нейросети необходимо запустить программу с концигурацией --example
     */
 
     bool runTests = false;
@@ -72,8 +72,8 @@ int main(int argc, char* argv[]) {
         NeuralNetwork default_model = NeuralNetwork();
         NeuralNetwork custom_model = NeuralNetwork(
             {2, 4, 4, 1},
-            {relu,  relu, sigmoid},
-            {reluDerivative,  reluDerivative, sigmoidDerivative});
+            {nnlab::tanh,  nnlab::tanh, sigmoid},
+            {nnlab::tanhDerivative,  nnlab::tanhDerivative, sigmoidDerivative});
 
         auto trainData = minMaxNormalization(genBinClassifyDataset(1000, 0.6));
         auto testData = minMaxNormalization(genBinClassifyDataset(300, 0.6));
@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
         default_model.train(trainData);
         custom_model.train(trainData, bceLoss, bceDerivative, 5000,
             0.01,
-            1e-4,
+            1e-5,
             20);
 
         auto weights = default_model.getWeights();
@@ -102,46 +102,15 @@ int main(int argc, char* argv[]) {
         for (int i = 0; i < test2.size(); i = i + 20) { std::cout << test2[i] << " " << testProba2[i] << std::endl; }
 
 
-        std::cout << "\nAccuracy: \nnet1: " << accuracy(test1, testData.second) <<
-            "\nnet2: " << accuracy(test2, testData.second) << std::endl;
-        std::cout << "\nRoc-Auc: \nnet1: " << rocAuc(testProba1, testData.second) <<
-            "\nnet2: " << rocAuc(testProba2, testData.second) << std::endl;
+        std::cout << "\nAccuracy: \ndefault: " << accuracy(test1, testData.second) <<
+            "\ncustom: " << accuracy(test2, testData.second) << std::endl;
+        std::cout << "\nRoc-Auc: \ndefault: " << rocAuc(testProba1, testData.second) <<
+            "\ncustom: " << rocAuc(testProba2, testData.second) << std::endl;
+
+        auto weights_custom = custom_model.getWeights();
+        for (Matrix& i: weights_custom) { std::cout << "\nLayer: \n" << i << std::endl; }
     }
     else{
-
-        NeuralNetwork net1 = NeuralNetwork(), net2 = NeuralNetwork();
-
-        auto trainData = minMaxNormalization(genBinClassifyDataset(1000, 0.4));
-        auto testData  = minMaxNormalization(genBinClassifyDataset(200, 0.6));
-
-        fileSaveToCSV("data/testData.csv", testData.first, testData.second);
-        plot("data/testData.csv");
-
-
-        net1.train(trainData);
-        net2.train(trainData, bceLoss, bceDerivative);
-
-        // auto weights = net1.getWeights();
-        // for (Matrix& i: weights) { std::cout << "\nLayer: \n" << i << std::endl; }
-
-        auto test1 = net1.predict(testData.first);
-        auto test2 = net2.predict(testData.first);
-        auto testProba1 = net1.predictProba(testData.first);
-        auto testProba2 = net2.predictProba(testData.first);
-
-        std::cout << "\nProbability test for net1:" << std::endl;
-        for (int i = 0; i < test1.size(); i = i + 20) { std::cout << test1[i] << " " << testProba1[i] << std::endl; }
-
-        std::cout << "\nProbability test for net2:" << std::endl;
-        for (int i = 0; i < test2.size(); i = i + 20) { std::cout << test2[i] << " " << testProba2[i] << std::endl; }
-
-
-        std::cout << "\nAccuracy: \nnet1: " << accuracy(test1, testData.second) <<
-            "\nnet2: " << accuracy(test2, testData.second) << std::endl;
-        std::cout << "\nRoc-Auc: \nnet1: " << rocAuc(testProba1, testData.second) <<
-            "\nnet2: " << rocAuc(testProba2, testData.second) << std::endl;
-
-
         return 0;
     }
 }
