@@ -120,7 +120,7 @@ double nnlab::bceLoss(double predictValue, int correctValue) {
 double nnlab::bceDerivative(double predictValue, int correctValue) {
     const double eps = 1e-7;
     double p = std::max(eps, std::min(1.0 - eps, predictValue));
-    return p - correctValue;
+    return (p - correctValue) / (p * (1 - p) + eps);
 }
 
 double nnlab::accuracy(const std::vector<int>& predict, const std::vector<int>& correct) {
