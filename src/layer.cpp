@@ -18,4 +18,3 @@ Layer::Layer(int inputSize, int outputSize,
 }
 
 
-

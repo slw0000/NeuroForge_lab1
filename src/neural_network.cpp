@@ -155,6 +155,8 @@ void NeuralNetwork::train(Dataset& trainData,
                 weights[j].weights = weights[j].weights + pVectors[j] * learningRate;
             }
 
+
+
             epochLoss += lossFunc(info.back()(0, 0), trainPoints[i]);
         }
 
