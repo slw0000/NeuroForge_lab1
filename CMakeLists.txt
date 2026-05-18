@@ -1,27 +1,28 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.15)
+project(nnlab_python LANGUAGES CXX)
 
-project(NeuralNetworkLab1 VERSION 1.0)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
-set(CMAKE_CXX_STANDARD 20)
+include(FetchContent)
+FetchContent_Declare(pybind11 URL https://github.com/pybind/pybind11/archive/refs/tags/v2.13.6.zip)
+FetchContent_MakeAvailable(pybind11)
 
-include_directories(
-        ${CMAKE_SOURCE_DIR}/include
-)
-
-add_executable(main src/main.cpp
-        src/file_import.cpp
+# Ваши исходники
+add_library(nnlab_core STATIC
         src/matrix_realization.cpp
-        src/visualization.cpp
-        src/utils.cpp
-        src/neural_network.cpp
         src/layer.cpp
-        tests/matrix_tests.cpp
-        tests/file_Import_tests.cpp
-        tests/visualization_tests.cpp
+        src/neural_network.cpp
+        src/utils.cpp
 )
+target_include_directories(nnlab_core PUBLIC include)
 
-file(COPY ${CMAKE_SOURCE_DIR}/data
-        DESTINATION ${CMAKE_BINARY_DIR})
+# Python-модуль
+pybind11_add_module(nnlab_py src/bindings.cpp)
+target_link_libraries(nnlab_py PRIVATE nnlab_core pybind11::module)
 
-file(COPY ${CMAKE_SOURCE_DIR}/scripts/
-        DESTINATION ${CMAKE_BINARY_DIR}/scripts)
+# Вывод .so/.pyd в папку dist/
+set_target_properties(nnlab_py PROPERTIES
+        LIBRARY_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/dist"
+        RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/dist"
+)
