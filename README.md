@@ -1,6 +1,8 @@
 # NeuroForge
 
-Библиотека на C++ для построения и обучения нейронных сетей для задачи бинарной классификации точек в двухмерном пространстве.
+ Высокопроизводительная C++ библиотека для построения и обучения нейронных сетей, оптимизированная для задачи бинарной классификации в двумерном пространстве.
+
+NeuroForge объединяет скорость компилируемого C++ кода с гибкостью Python-экосистемы. Ядро библиотеки реализовано на чистом C++17 без внешних зависимостей, а интеграция с Python осуществляется через `pybind11` с прямой поддержкой `numpy` массивов.
 
 Состав команды:
 - Голубев Артём
@@ -22,6 +24,7 @@
 - Импорт/экспорт данных в формате CSV
 - Визуализация данных через Python (matplotlib)
 - Тесты для всех основных компонентов
+- **Python API**: полная обвязка через `pybind11` с нулевыми копиями через `numpy`
 
 ---
 
@@ -42,8 +45,10 @@ NeuroForge/
 │   ├── utils.cpp
 │   ├── layer.cpp
 │   ├── neural_network.cpp
+│   ├── bindings.cpp
 │   ├── file_import.cpp
 │   └── visualization.cpp
+
 ├── tests/
 │   ├── matrix_tests.cpp
 │   ├── file_import_tests.cpp
@@ -61,7 +66,7 @@ NeuroForge/
 
 ### Зависимости
 
-Python-зависимости для визуализации:
+Python-зависимости для визуализации и обвязки через pybind11:
 ```bash
 pip install -r requirements.txt
 ```
@@ -69,9 +74,15 @@ pip install -r requirements.txt
 ### Сборка
 
 ```bash
-mkdir build && cd build
-cmake ..
-make
+cd C:\Users\yesia\CLionProjects\NeuroForge
+Remove-Item -Recurse -Force build
+mkdir build
+cd build
+cmake .. -G "Visual Studio 17 2022"
+cmake --build . --config Release
+cd ..
+Copy-Item -Path "dist\Release\nnlab_py.cp313-win_amd64.pyd" -Destination "scripts\" -Force
+
 ```
 
 ### Запуск демонстрации
@@ -85,6 +96,9 @@ make
 ```bash
 ./main --test
 ```
+
+### Запуск Python-скрипта
+Подключить Python - интерпретатор и запустить scripts/nnlab.py
 
 ---
 
@@ -115,6 +129,34 @@ auto probabilities   = net.predictProba(testData.first);
 // Метрики
 std::cout << "Accuracy: " << accuracy(predictions, testData.second) << std::endl;
 std::cout << "ROC-AUC:  " << rocAuc(probabilities, testData.second)  << std::endl;
+```
+
+### Python Api
+```python
+import numpy as np
+import nnlab_py
+
+# Генерация и нормализация данных
+X, y = nnlab_py.gen_dataset(count=1000, noise=0.5)
+X_norm, y_norm = nnlab_py.min_max_normalization(X, y)
+
+# Инициализация модели
+model = nnlab_py.NeuralNetwork(
+    structure=[2, 8, 4, 1],
+    activations=[nnlab_py.tanh, nnlab_py.tanh, nnlab_py.sigmoid],
+    activations_deriv=[nnlab_py.tanhDerivative, nnlab_py.tanhDerivative, nnlab_py.sigmoidDerivative]
+)
+
+# Обучение (GIL освобождается автоматически)
+model.train(X_norm, y_norm,
+            loss_func=nnlab_py.bceLoss,
+            loss_deriv=nnlab_py.bceDerivative,
+            max_epochs=1000, lr=0.05, min_delta=1e-5, patience=20)
+
+# Предсказание и оценка
+preds = model.predict(X_norm)
+proba = model.predict_proba(X_norm)
+print(f"Accuracy: {np.mean(preds == y_norm):.3f}")
 ```
 
 ### Настройка архитектуры

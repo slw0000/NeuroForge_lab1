@@ -51,27 +51,32 @@ Dataset nnlab::minMaxNormalization(
 
     if (data.first.empty()) { throw std::invalid_argument("Массив координат не может быть пустым!"); }
 
-    double minX, minY, maxX, maxY;
-    minX = data.first[0](0, 0);
-    minY = data.first[0](1, 0);
-    maxX = data.first[0](0, 0);
-    maxY = data.first[0](1, 0);
+    auto dim = data.first[0].rows();
+
+    std::vector<double> min, max;
+    for (size_t i = 0; i < dim; i++) {
+        min.push_back(data.first[0](i, 0));
+        max.push_back(data.first[0](i, 0));
+    }
+
 
     for (const auto& dot: data.first) {
-        minX = std::min(minX, dot(0, 0));
-        minY = std::min(minY, dot(1, 0));
-        maxX = std::max(maxX, dot(0, 0));
-        maxY = std::max(maxY, dot(1, 0));
+        for (size_t i = 0; i < dim; i++) {
+            min[i] = std::min(min[i], dot(i, 0));
+            max[i] = std::max(max[i], dot(i, 0));
+        }
     }
 
     auto result = data;
     for (auto& dot: result.first) {
-        dot(0, 0) = (maxX != minX) ? (dot(0, 0) - minX) / (maxX - minX) : 0.0;
-        dot(1, 0) = (maxY != minY) ? (dot(1, 0) - minY) / (maxY - minY) : 0.0;
+        for (size_t i = 0; i < dim; i++) {
+            dot(i, 0) = (max[i] != min[i]) ? (dot(i, 0) - min[i]) / (max[i] - min[i]) : 0.0;
+        }
     }
 
     return result;
 }
+
 
 double nnlab::sigmoid(double x) {
     return 1.0 / (1.0 + std::exp(-x));
